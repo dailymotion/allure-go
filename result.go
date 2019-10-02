@@ -65,6 +65,7 @@ func Test(t *testing.T, description string, testFunc func()) {
 	var r Result
 	r.UUID = generateUUID()
 	r.Start = time.Now().Unix()
+	r.Name = description
 	r.setLabels(t)
 
 	defer func() {
