@@ -15,7 +15,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-//Container is the top level report object for a test
+//Result is the top level report object for a test
 type Result struct {
 	UUID          string         `json:"uuid,omitempty"`
 	Name          string         `json:"name,omitempty"`
@@ -60,7 +60,7 @@ func init() {
 	resultPath = fmt.Sprintf("%s/allure-results", wsd)
 }
 
-//Test execute the test and creates an Allure container used by Allure reports
+//Test execute the test and creates an Allure result used by Allure reports
 func Test(t *testing.T, description string, testFunc func()) {
 	var r Result
 	r.UUID = generateUUID()
@@ -74,7 +74,7 @@ func Test(t *testing.T, description string, testFunc func()) {
 
 		err := r.writeResultsFile()
 		if err != nil {
-			log.Fatalf(fmt.Sprintf("Failed to write content of container to json file"), err)
+			log.Fatalf(fmt.Sprintf("Failed to write content of result to json file"), err)
 			os.Exit(1)
 		}
 	}()
