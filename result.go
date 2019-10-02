@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -54,8 +53,7 @@ type Parameter struct {
 var wsd, resultPath string
 
 func init() {
-	_, f, _, _ := runtime.Caller(0)
-	wsd = filepath.Dir(f)
+	wsd = os.Getenv("ALLURE_RESULTS_PATH")
 
 	resultPath = fmt.Sprintf("%s/allure-results", wsd)
 }
