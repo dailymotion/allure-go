@@ -14,6 +14,12 @@ This will retrieve the library.
 
 ## Using
 
+First of all, you need to set an environment variable to define the `allure-results` folder location:
+```
+export ALLURE_RESULTS_PATH=/some/path
+```
+This should be the path where the `allure-results` folder exists or should be created, not the path of the folder itself.
+
 To implement this library in your tests, follow the [examples](example/example_test.go).
 
 To run test, use the usual go test command :
