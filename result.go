@@ -113,7 +113,7 @@ func (r *Result) writeResultsFile() error {
 			return errors.Wrap(err, "Failed to create allure-results folder")
 		}
 	}
-	err = ioutil.WriteFile(fmt.Sprintf("%s/allure-results/%s-result.json", wsd, r.UUID), j, 0777)
+	err = ioutil.WriteFile(fmt.Sprintf("%s/allure-results/%s-result.json", resultPath, r.UUID), j, 0777)
 	if err != nil {
 		return errors.Wrap(err, "Failed to write in file")
 	}
