@@ -52,14 +52,11 @@ type Parameter struct {
 
 var wsd, resultPath string
 
-func init() {
-	wsd = os.Getenv("ALLURE_RESULTS_PATH")
-
-	resultPath = fmt.Sprintf("%s/allure-results", wsd)
-}
-
 //Test execute the test and creates an Allure result used by Allure reports
 func Test(t *testing.T, description string, testFunc func()) {
+	wsd = os.Getenv("ALLURE_RESULTS_PATH")
+	resultPath = fmt.Sprintf("%s/allure-results", wsd)
+
 	var r Result
 	r.UUID = generateUUID()
 	r.Start = time.Now().Unix()
