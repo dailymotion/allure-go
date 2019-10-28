@@ -59,12 +59,12 @@ func Test(t *testing.T, description string, testFunc func()) {
 
 	var r Result
 	r.UUID = generateUUID()
-	r.Start = time.Now().Unix()
+	r.Start = getTimestampMs()
 	r.Name = description
 	r.setLabels(t)
 
 	defer func() {
-		r.Stop = time.Now().Unix()
+		r.Stop = getTimestampMs()
 		r.Status = GetTestStatus(t)
 		r.Stage = "finished"
 
@@ -115,4 +115,8 @@ func (r *Result) writeResultsFile() error {
 		return errors.Wrap(err, "Failed to write in file")
 	}
 	return nil
+}
+
+func getTimestampMs() int64 {
+	return time.Now().UnixNano() / int64(time.Millisecond)
 }
