@@ -21,7 +21,7 @@ type Result struct {
 	Status        string         `json:"status,omitempty"`
 	StatusDetails *StatusDetails `json:"statusDetails,omitempty"`
 	Stage         string         `json:"stage,omitempty"`
-	Steps         []Step         `json:"steps,omitempty"`
+	Steps         []StepObject   `json:"steps,omitempty"`
 	Attachments   []Attachment   `json:"attachments,omitempty"`
 	Parameters    []Parameter    `json:"parameters,omitempty"`
 	Start         int64          `json:"start,omitempty"`
@@ -31,6 +31,7 @@ type Result struct {
 	FullName      string         `json:"fullName,omitempty"`
 	Labels        []Label        `json:"labels,omitempty"`
 }
+type FailureMode string
 
 //Before defines a step
 type Before struct {
@@ -41,7 +42,7 @@ type Before struct {
 	Description   string         `json:"description,omitempty"`
 	Start         int64          `json:"start,omitempty"`
 	Stop          int64          `json:"stop,omitempty"`
-	Steps         []Step         `json:"steps,omitempty"`
+	Steps         []StepObject   `json:"steps,omitempty"`
 	Attachments   []Attachment   `json:"attachments,omitempty"`
 }
 
@@ -52,9 +53,18 @@ type Parameter struct {
 
 var wsd, resultPath string
 
+const (
+	ALLURE_RESULTS_PATH = "ALLURE_RESULTS_PATH"
+	nodeKey             = "root"
+)
+
 //Test execute the test and creates an Allure result used by Allure reports
 func Test(t *testing.T, description string, testFunc func()) {
-	wsd = os.Getenv("ALLURE_RESULTS_PATH")
+	wsd = os.Getenv(ALLURE_RESULTS_PATH)
+	if wsd == "" {
+		log.Fatalf(fmt.Sprintf("%s environment variable cannot be empty", ALLURE_RESULTS_PATH))
+		os.Exit(1)
+	}
 	resultPath = fmt.Sprintf("%s/allure-results", wsd)
 
 	var r Result
