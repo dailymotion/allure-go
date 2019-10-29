@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -54,7 +55,8 @@ var wsd, resultPath string
 
 //Test execute the test and creates an Allure result used by Allure reports
 func Test(t *testing.T, description string, testFunc func()) {
-	wsd = os.Getenv("ALLURE_RESULTS_PATH")
+	_, file, _, _ := runtime.Caller(0)
+	wsd := filepath.Dir(file)
 	resultPath = fmt.Sprintf("%s/allure-results", wsd)
 
 	var r Result
