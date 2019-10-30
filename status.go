@@ -11,7 +11,7 @@ const (
 	skipped = "skipped"
 )
 
-type StatusDetails struct {
+type statusDetails struct {
 	Known   bool   `json:"known,omitempty"`
 	Muted   bool   `json:"muted,omitempty"`
 	Flaky   bool   `json:"flaky,omitempty"`
@@ -19,7 +19,7 @@ type StatusDetails struct {
 	Trace   string `json:"trace,omitempty"`
 }
 
-func GetTestStatus(t *testing.T) string {
+func getTestStatus(t *testing.T) string {
 	if t.Failed() {
 		return failed
 	} else if t.Skipped() {

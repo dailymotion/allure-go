@@ -3,6 +3,7 @@ package allure
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/jtolds/gls"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,14 +15,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-//Result is the top level report object for a test
-type Result struct {
+//result is the top level report object for a test
+type result struct {
 	UUID          string         `json:"uuid,omitempty"`
 	Name          string         `json:"name,omitempty"`
+	Description   string         `json:"description,omitempty"`
 	Status        string         `json:"status,omitempty"`
-	StatusDetails *StatusDetails `json:"statusDetails,omitempty"`
+	StatusDetails *statusDetails `json:"statusDetails,omitempty"`
 	Stage         string         `json:"stage,omitempty"`
-	Steps         []StepObject   `json:"steps,omitempty"`
+	Steps         []stepObject   `json:"steps,omitempty"`
 	Attachments   []Attachment   `json:"attachments,omitempty"`
 	Parameters    []Parameter    `json:"parameters,omitempty"`
 	Start         int64          `json:"start,omitempty"`
@@ -37,13 +39,26 @@ type FailureMode string
 type Before struct {
 	Name          string         `json:"name,omitempty"`
 	Status        string         `json:"status,omitempty"`
-	StatusDetails *StatusDetails `json:"statusDetails,omitempty"`
+	StatusDetails *statusDetails `json:"statusDetails,omitempty"`
 	Stage         string         `json:"stage,omitempty"`
 	Description   string         `json:"description,omitempty"`
 	Start         int64          `json:"start,omitempty"`
 	Stop          int64          `json:"stop,omitempty"`
-	Steps         []StepObject   `json:"steps,omitempty"`
+	Steps         []stepObject   `json:"steps,omitempty"`
 	Attachments   []Attachment   `json:"attachments,omitempty"`
+}
+
+type HasSteps interface {
+	GetSteps() []stepObject
+	AddStep(step stepObject)
+}
+
+func (r *result) GetSteps() []stepObject {
+	return r.Steps
+}
+
+func (r *result) AddStep(step stepObject) {
+	r.Steps = append(r.Steps, step)
 }
 
 type Parameter struct {
@@ -55,7 +70,7 @@ var wsd, resultPath string
 
 const (
 	ALLURE_RESULTS_PATH = "ALLURE_RESULTS_PATH"
-	nodeKey             = "root"
+	nodeKey             = "current_step_container"
 )
 
 //Test execute the test and creates an Allure result used by Allure reports
@@ -67,28 +82,31 @@ func Test(t *testing.T, description string, testFunc func()) {
 	}
 	resultPath = fmt.Sprintf("%s/allure-results", wsd)
 
-	var r Result
+	var r *result
+	r = newResult()
 	r.UUID = generateUUID()
 	r.Start = time.Now().Unix()
-	r.Name = description
+	r.Name = t.Name()
+	r.Description = description
 	r.setLabels(t)
+	r.Steps = make([]stepObject, 0)
 
 	defer func() {
 		r.Stop = time.Now().Unix()
-		r.Status = GetTestStatus(t)
+		r.Status = getTestStatus(t)
 		r.Stage = "finished"
 
 		err := r.writeResultsFile()
+		//err := r.writeResultsFile()
 		if err != nil {
 			log.Fatalf(fmt.Sprintf("Failed to write content of result to json file"), err)
 			os.Exit(1)
 		}
 	}()
-
-	testFunc()
+	ctxMgr.SetValues(gls.Values{"test_result_object": r, nodeKey: r}, testFunc)
 }
 
-func (r *Result) setLabels(t *testing.T) {
+func (r *result) setLabels(t *testing.T) {
 	_, testFile, _, _ := runtime.Caller(2)
 	testPackage := strings.TrimSuffix(strings.Replace(strings.TrimPrefix(testFile, wsd+"/"), "/", ".", -1), ".go")
 
@@ -109,7 +127,7 @@ func (r *Result) setLabels(t *testing.T) {
 	r.Labels = append(r.Labels, methodLabel)
 }
 
-func (r *Result) writeResultsFile() error {
+func (r *result) writeResultsFile() error {
 	j, err := json.Marshal(r)
 	if err != nil {
 		return errors.Wrap(err, "Failed to marshall result into JSON")
@@ -125,4 +143,11 @@ func (r *Result) writeResultsFile() error {
 		return errors.Wrap(err, "Failed to write in file")
 	}
 	return nil
+}
+
+func newResult() *result {
+	return &result{
+		UUID:  generateUUID(),
+		Start: time.Now().Unix(),
+	}
 }
