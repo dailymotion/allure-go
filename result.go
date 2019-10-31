@@ -150,6 +150,7 @@ func newResult() *result {
 		UUID:  generateUUID(),
 		Start: time.Now().Unix(),
 	}
+}
 
 func getTimestampMs() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
