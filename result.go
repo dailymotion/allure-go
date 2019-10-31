@@ -85,14 +85,14 @@ func Test(t *testing.T, description string, testFunc func()) {
 	var r *result
 	r = newResult()
 	r.UUID = generateUUID()
-	r.Start = time.Now().Unix()
+	r.Start = getTimestampMs()
 	r.Name = t.Name()
 	r.Description = description
 	r.setLabels(t)
 	r.Steps = make([]stepObject, 0)
 
 	defer func() {
-		r.Stop = time.Now().Unix()
+		r.Stop = getTimestampMs()
 		r.Status = getTestStatus(t)
 		r.Stage = "finished"
 
@@ -150,4 +150,7 @@ func newResult() *result {
 		UUID:  generateUUID(),
 		Start: time.Now().Unix(),
 	}
+
+func getTimestampMs() int64 {
+	return time.Now().UnixNano() / int64(time.Millisecond)
 }
