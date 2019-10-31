@@ -32,13 +32,17 @@ func TestPassedWithStepsExample(t *testing.T) {
 func TestWithIntricateSubsteps(t *testing.T) {
 	allure.Test(t, "Test", func() {
 		allure.Step("Step 1", func() {
-			allure.Step("Sub-step 1.1", func() {})
+			allure.Step("Sub-step 1.1", func() {
+				t.Errorf("Failure")
+			})
 			allure.Step("Sub-step 1.2", func() {})
 		})
 		allure.Step("Step 2", func() {
 			allure.Step("Sub-step 2.1", func() {
 				allure.Step("Step 2.1.1", func() {
-					allure.Step("Sub-step 2.1.1.1", func() {})
+					allure.Step("Sub-step 2.1.1.1", func() {
+						t.Errorf("Failure")
+					})
 					allure.Step("Sub-step 2.1.1.2", func() {})
 				})
 			})
