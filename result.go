@@ -61,11 +61,6 @@ func (r *result) AddStep(step stepObject) {
 	r.Steps = append(r.Steps, step)
 }
 
-type Parameter struct {
-	Name  string `json:"name,omitempty"`
-	Value string `json:"value,omitempty"`
-}
-
 var wsd, resultPath string
 
 const (
@@ -73,8 +68,7 @@ const (
 	nodeKey             = "current_step_container"
 )
 
-//Test execute the test and creates an Allure result used by Allure reports
-func Test(t *testing.T, description string, testFunc func()) {
+func TestWithParameters(t *testing.T, description string, parameters map[string]interface{}, testFunc func()) {
 	wsd = os.Getenv(ALLURE_RESULTS_PATH)
 	if wsd == "" {
 		log.Fatalf(fmt.Sprintf("%s environment variable cannot be empty", ALLURE_RESULTS_PATH))
@@ -90,6 +84,9 @@ func Test(t *testing.T, description string, testFunc func()) {
 	r.Description = description
 	r.setLabels(t)
 	r.Steps = make([]stepObject, 0)
+	if parameters == nil || len(parameters) > 0 {
+		r.Parameters = convertMapToParameters(parameters)
+	}
 
 	defer func() {
 		r.Stop = getTimestampMs()
@@ -104,6 +101,11 @@ func Test(t *testing.T, description string, testFunc func()) {
 		}
 	}()
 	ctxMgr.SetValues(gls.Values{"test_result_object": r, nodeKey: r}, testFunc)
+}
+
+//Test execute the test and creates an Allure result used by Allure reports
+func Test(t *testing.T, description string, testFunc func()) {
+	TestWithParameters(t, description, nil, testFunc)
 }
 
 func (r *result) setLabels(t *testing.T) {
