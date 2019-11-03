@@ -43,7 +43,9 @@ func TestWithIntricateSubsteps(t *testing.T) {
 					allure.Step("Sub-step 2.1.1.1", func() {
 						t.Errorf("Failure")
 					})
-					allure.Step("Sub-step 2.1.1.2", func() {})
+					allure.Step("Sub-step 2.1.1.2", func() {
+						t.Error("Failed like this")
+					})
 				})
 			})
 			allure.Step("Sub-step 2.2", func() {})
