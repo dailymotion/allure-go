@@ -148,7 +148,7 @@ func (r *result) writeResultsFile() error {
 func newResult() *result {
 	return &result{
 		UUID:  generateUUID(),
-		Start: time.Now().Unix(),
+		Start: getTimestampMs(),
 	}
 }
 
