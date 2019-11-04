@@ -66,22 +66,8 @@ type Parameter struct {
 	Value string `json:"value,omitempty"`
 }
 
-var wsd, resultPath string
-
-const (
-	ALLURE_RESULTS_PATH = "ALLURE_RESULTS_PATH"
-	nodeKey             = "current_step_container"
-)
-
 //Test execute the test and creates an Allure result used by Allure reports
 func Test(t *testing.T, description string, testFunc func()) {
-	wsd = os.Getenv(ALLURE_RESULTS_PATH)
-	if wsd == "" {
-		log.Fatalf(fmt.Sprintf("%s environment variable cannot be empty", ALLURE_RESULTS_PATH))
-		os.Exit(1)
-	}
-	resultPath = fmt.Sprintf("%s/allure-results", wsd)
-
 	var r *result
 	r = newResult()
 	r.UUID = generateUUID()

@@ -16,22 +16,10 @@ func TestPassedExample(t *testing.T) {
 	})
 }
 
-func TestPassedWithStepsExample(t *testing.T) {
-	allure.Test(t, "This is a test to show allure step implementation with a passing test", func() {
-		example.DoSomething()
-		allure.Step("Doing a funny", func() {
-			s := "Hello world"
-			if len(s) == 0 {
-				t.Errorf("Expected 'hello world' string, but got %s ", s)
-			}
-		})
-
-	})
-}
-
 func TestWithIntricateSubsteps(t *testing.T) {
 	allure.Test(t, "Test", func() {
 		allure.Step("Step 1", func() {
+			example.DoSomething()
 			allure.Step("Sub-step 1.1", func() {
 				t.Errorf("Failure")
 			})
