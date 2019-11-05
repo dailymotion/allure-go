@@ -3,7 +3,6 @@ package allure
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jtolds/gls"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/jtolds/gls"
 
 	"github.com/pkg/errors"
 )
@@ -33,7 +34,6 @@ type result struct {
 	FullName      string         `json:"fullName,omitempty"`
 	Labels        []Label        `json:"labels,omitempty"`
 }
-
 type FailureMode string
 
 //Before defines a step
@@ -80,22 +80,8 @@ type Parameter struct {
 	Value string `json:"value,omitempty"`
 }
 
-var wsd, resultPath string
-
-const (
-	ALLURE_RESULTS_PATH = "ALLURE_RESULTS_PATH"
-	nodeKey             = "current_step_container"
-)
-
 //Test execute the test and creates an Allure result used by Allure reports
 func Test(t *testing.T, description string, testFunc func()) {
-	wsd = os.Getenv(ALLURE_RESULTS_PATH)
-	if wsd == "" {
-		log.Fatalf(fmt.Sprintf("%s environment variable cannot be empty", ALLURE_RESULTS_PATH))
-		os.Exit(1)
-	}
-	resultPath = fmt.Sprintf("%s/allure-results", wsd)
-
 	var r *result
 	r = newResult()
 	r.UUID = generateUUID()
@@ -111,7 +97,6 @@ func Test(t *testing.T, description string, testFunc func()) {
 		r.Stage = "finished"
 
 		err := r.writeResultsFile()
-		//err := r.writeResultsFile()
 		if err != nil {
 			log.Fatalf(fmt.Sprintf("Failed to write content of result to json file"), err)
 			os.Exit(1)
@@ -121,6 +106,8 @@ func Test(t *testing.T, description string, testFunc func()) {
 }
 
 func (r *result) setLabels(t *testing.T) {
+	wsd := os.Getenv(wsPathEnvKey)
+
 	_, testFile, _, _ := runtime.Caller(2)
 	testPackage := strings.TrimSuffix(strings.Replace(strings.TrimPrefix(testFile, wsd+"/"), "/", ".", -1), ".go")
 
@@ -142,6 +129,12 @@ func (r *result) setLabels(t *testing.T) {
 }
 
 func (r *result) writeResultsFile() error {
+	resultsPathEnv := os.Getenv(resultsPathEnvKey)
+	if resultsPathEnv == "" {
+		log.Fatalf("%s environment variable cannot be empty", resultsPathEnvKey)
+	}
+	resultPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+
 	j, err := json.Marshal(r)
 	if err != nil {
 		return errors.Wrap(err, "Failed to marshall result into JSON")
