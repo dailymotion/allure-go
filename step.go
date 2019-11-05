@@ -24,12 +24,12 @@ func (s *stepObject) AddStep(step stepObject) {
 	s.ChildrenSteps = append(s.ChildrenSteps, step)
 }
 
-// allure.Step is meant to be wrapped around actions
+// Step is meant to be wrapped around actions
 func Step(description string, action func()) {
 	StepWithParameter(description, nil, action)
 }
 
-// allure.StepWithParameter is meant to be wrapped around actions with the purpose of logging the parameters
+// StepWithParameter is meant to be wrapped around actions with the purpose of logging the parameters
 func StepWithParameter(description string, parameters map[string]interface{}, action func()) {
 	step := newStep()
 	step.Name = description
