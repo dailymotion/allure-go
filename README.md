@@ -39,6 +39,17 @@ This will automatically generate and open the HTML reports in a browser.
 
 The results file are compatible with the [Jenkins plugin](https://wiki.jenkins.io/display/JENKINS/Allure+Plugin).
 
+## Optional environment variable
+
+Allure-go will retrieve the absolute path of your testing files (for example, /Users/myuser/Dev/myProject/tests/myfile_test.go) and will display this path in the reports.
+
+To make it cleaner, you can trim prefix the path of your project by defining the `ALLURE_WORKSPACE_PATH` with the value of your project root path :
+```
+export ALLURE_WORKSPACE_PATH=/another/path
+```
+
+You will now get the relative path of your test files from your project root level.
+
 ## Goals
 
 This project is an open source repository with multiple goals to achieve :
