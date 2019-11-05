@@ -3,7 +3,6 @@ package allure
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jtolds/gls"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/jtolds/gls"
 
 	"github.com/pkg/errors"
 )
@@ -93,6 +94,8 @@ func Test(t *testing.T, description string, testFunc func()) {
 }
 
 func (r *result) setLabels(t *testing.T) {
+	wsd := os.Getenv(wsPathEnvKey)
+
 	_, testFile, _, _ := runtime.Caller(2)
 	testPackage := strings.TrimSuffix(strings.Replace(strings.TrimPrefix(testFile, wsd+"/"), "/", ".", -1), ".go")
 
@@ -114,6 +117,12 @@ func (r *result) setLabels(t *testing.T) {
 }
 
 func (r *result) writeResultsFile() error {
+	resultsPathEnv := os.Getenv(resultsPathEnvKey)
+	if resultsPathEnv == "" {
+		log.Fatalf("%s environment variable cannot be empty", resultsPathEnvKey)
+	}
+	resultPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+
 	j, err := json.Marshal(r)
 	if err != nil {
 		return errors.Wrap(err, "Failed to marshall result into JSON")

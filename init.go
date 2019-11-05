@@ -1,10 +1,7 @@
 package allure
 
 import (
-	"fmt"
 	"github.com/jtolds/gls"
-	"log"
-	"os"
 )
 
 var (
@@ -15,14 +12,10 @@ var (
 
 const (
 	resultsPathEnvKey = "ALLURE_RESULTS_PATH"
+	wsPathEnvKey      = "ALLURE_WORKSPACE_PATH"
 	nodeKey           = "current_step_container"
 )
 
 func init() {
 	ctxMgr = gls.NewContextManager()
-	wsd = os.Getenv(resultsPathEnvKey)
-	if wsd == "" {
-		log.Fatalf("%s environment variable cannot be empty", resultsPathEnvKey)
-	}
-	resultPath = fmt.Sprintf("%s/allure-results", wsd)
 }
