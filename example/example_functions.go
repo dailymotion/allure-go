@@ -2,12 +2,12 @@ package example
 
 import "github.com/dailymotion/allure-go"
 
-func DoSomething() {
+func doSomething() {
 	allure.Step("Something", func() {
-		DoSomethingNested()
+		doSomethingNested()
 	})
 }
 
-func DoSomethingNested() {
+func doSomethingNested() {
 	allure.Step("Because we can!", func() {})
 }
