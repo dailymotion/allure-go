@@ -3,7 +3,6 @@ package allure
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jtolds/gls"
 	"io/ioutil"
 	"log"
 	"os"
@@ -12,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jtolds/gls"
 	"github.com/pkg/errors"
 )
 
@@ -61,21 +61,13 @@ func (r *result) AddStep(step stepObject) {
 	r.Steps = append(r.Steps, step)
 }
 
-var wsd, resultPath string
+type Parameter struct {
+	Name  string `json:"name,omitempty"`
+	Value string `json:"value,omitempty"`
+}
 
-const (
-	ALLURE_RESULTS_PATH = "ALLURE_RESULTS_PATH"
-	nodeKey             = "current_step_container"
-)
-
-func TestWithParameters(t *testing.T, description string, parameters map[string]interface{}, testFunc func()) {
-	wsd = os.Getenv(ALLURE_RESULTS_PATH)
-	if wsd == "" {
-		log.Fatalf(fmt.Sprintf("%s environment variable cannot be empty", ALLURE_RESULTS_PATH))
-		os.Exit(1)
-	}
-	resultPath = fmt.Sprintf("%s/allure-results", wsd)
-
+//Test execute the test and creates an Allure result used by Allure reports
+func Test(t *testing.T, description string, testFunc func()) {
 	var r *result
 	r = newResult()
 	r.UUID = generateUUID()
@@ -84,9 +76,6 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 	r.Description = description
 	r.setLabels(t)
 	r.Steps = make([]stepObject, 0)
-	if parameters == nil || len(parameters) > 0 {
-		r.Parameters = convertMapToParameters(parameters)
-	}
 
 	defer func() {
 		r.Stop = getTimestampMs()
@@ -94,7 +83,6 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 		r.Stage = "finished"
 
 		err := r.writeResultsFile()
-		//err := r.writeResultsFile()
 		if err != nil {
 			log.Fatalf(fmt.Sprintf("Failed to write content of result to json file"), err)
 			os.Exit(1)
@@ -103,12 +91,9 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 	ctxMgr.SetValues(gls.Values{"test_result_object": r, nodeKey: r}, testFunc)
 }
 
-//Test execute the test and creates an Allure result used by Allure reports
-func Test(t *testing.T, description string, testFunc func()) {
-	TestWithParameters(t, description, nil, testFunc)
-}
-
 func (r *result) setLabels(t *testing.T) {
+	wsd := os.Getenv(wsPathEnvKey)
+
 	_, testFile, _, _ := runtime.Caller(2)
 	testPackage := strings.TrimSuffix(strings.Replace(strings.TrimPrefix(testFile, wsd+"/"), "/", ".", -1), ".go")
 
@@ -130,6 +115,12 @@ func (r *result) setLabels(t *testing.T) {
 }
 
 func (r *result) writeResultsFile() error {
+	resultsPathEnv := os.Getenv(resultsPathEnvKey)
+	if resultsPathEnv == "" {
+		log.Fatalf("%s environment variable cannot be empty", resultsPathEnvKey)
+	}
+	resultPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+
 	j, err := json.Marshal(r)
 	if err != nil {
 		return errors.Wrap(err, "Failed to marshall result into JSON")
@@ -150,7 +141,7 @@ func (r *result) writeResultsFile() error {
 func newResult() *result {
 	return &result{
 		UUID:  generateUUID(),
-		Start: time.Now().Unix(),
+		Start: getTimestampMs(),
 	}
 }
 

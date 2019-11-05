@@ -1,10 +1,8 @@
 package allure
 
 import (
-	"fmt"
 	"github.com/jtolds/gls"
 	"log"
-	"time"
 )
 
 type stepObject struct {
@@ -18,25 +16,6 @@ type stepObject struct {
 	Stop          int64        `json:"stop"`
 }
 
-//"status": "passed",
-//      "stage": "finished",
-//      "steps": [
-//        {
-//          "name": "Other stuff",
-//          "status": "passed",
-//          "stage": "finished",
-//          "steps": [],
-//          "attachments": [],
-//          "parameters": [],
-//          "start": 1572368980980,
-//          "stop": 1572368980981
-//        }
-//      ],
-//      "attachments": [],
-//      "parameters": [],
-//      "start": 1572368980979,
-//      "stop": 1572368980982
-
 func (s *stepObject) GetSteps() []stepObject {
 	return s.ChildrenSteps
 }
@@ -46,18 +25,17 @@ func (s *stepObject) AddStep(step stepObject) {
 }
 
 func Step(description string, action func()) {
-	log.Println(description)
 	step := newStep()
 	step.Name = description
-	step.Start = time.Now().Unix()
+	step.Start = getTimestampMs()
 	defer func() {
-		step.Stop = time.Now().Unix()
+		step.Stop = getTimestampMs()
 		currentStepObj, ok := ctxMgr.GetValue(nodeKey)
 		if ok {
 			currentStep := currentStepObj.(HasSteps)
 			currentStep.AddStep(*step)
 		} else {
-			fmt.Println("WTF?")
+			log.Fatalln("could not retrieve current node")
 		}
 
 	}()
