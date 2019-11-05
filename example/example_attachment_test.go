@@ -1,4 +1,4 @@
-package example_test
+package example
 
 import (
 	"github.com/dailymotion/allure-go"
@@ -10,7 +10,7 @@ import (
 func TestTextAttachmentToStep(t *testing.T) {
 	allure.Test(t, "Testing a text attachment", func() {
 		allure.Step("adding a text attachment", func() {
-			_ = allure.AddTextAttachment("text!", allure.TextPlain, "Some text!")
+			_ = allure.AddAttachment("text!", allure.TextPlain, []byte("Some text!"))
 		})
 	})
 }
@@ -22,14 +22,14 @@ func TestImageAttachmentToStep(t *testing.T) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			_ = allure.AddByteArrayAttachment("mahi-mahi", allure.ImagePng, dat)
+			_ = allure.AddAttachment("mahi-mahi", allure.ImagePng, dat)
 		})
 	})
 }
 
 func TestTextAttachment(t *testing.T) {
 	allure.Test(t, "Testing a text attachment", func() {
-		_ = allure.AddTextAttachment("text!", allure.TextPlain, "Some text!")
+		_ = allure.AddAttachment("text!", allure.TextPlain, []byte("Some text!"))
 	})
 }
 
@@ -39,6 +39,6 @@ func TestImageAttachment(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		_ = allure.AddByteArrayAttachment("mahi-mahi", allure.ImagePng, dat)
+		_ = allure.AddAttachment("mahi-mahi", allure.ImagePng, dat)
 	})
 }

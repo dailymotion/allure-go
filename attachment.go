@@ -17,20 +17,7 @@ type attachment struct {
 
 type MimeType string
 
-func AddTextAttachment(name string, mimeType MimeType, content string) error {
-	attachment := newAttachment(name, mimeType, []byte(content))
-	err := attachment.writeAttachmentFile()
-	if err != nil {
-		return errors.Wrap(err, "Failed to create an attachment file")
-	}
-	if hasAttachments, ok := ctxMgr.GetValue(nodeKey); ok {
-		hasAttachments.(HasAttachments).AddAttachment(*attachment)
-	}
-
-	return nil
-}
-
-func AddByteArrayAttachment(name string, mimeType MimeType, content []byte) error {
+func AddAttachment(name string, mimeType MimeType, content []byte) error {
 	attachment := newAttachment(name, mimeType, content)
 	err := attachment.writeAttachmentFile()
 	if err != nil {

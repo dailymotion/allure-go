@@ -10,7 +10,7 @@ type stepObject struct {
 	Status        string       `json:"status,omitempty"`
 	Stage         string       `json:"stage"`
 	ChildrenSteps []stepObject `json:"steps"`
-	Attachments  []attachment `json:"attachments"`
+	Attachments   []attachment `json:"attachments"`
 	Parameters    []string     `json:"parameters"`
 	Start         int64        `json:"start"`
 	Stop          int64        `json:"stop"`
@@ -55,7 +55,7 @@ func Step(description string, action func()) {
 
 func newStep() *stepObject {
 	return &stepObject{
-		Attachments:  make([]attachment, 0),
+		Attachments:   make([]attachment, 0),
 		ChildrenSteps: make([]stepObject, 0),
 	}
 }
