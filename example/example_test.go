@@ -18,7 +18,7 @@ func TestPassedExample(t *testing.T) {
 func TestWithIntricateSubsteps(t *testing.T) {
 	allure.Test(t, "Test", func() {
 		allure.Step("Step 1", func() {
-			DoSomething()
+			doSomething()
 			allure.Step("Sub-step 1.1", func() {
 				t.Errorf("Failure")
 			})
