@@ -1,8 +1,9 @@
 package allure
 
 import (
-	"github.com/jtolds/gls"
 	"log"
+
+	"github.com/jtolds/gls"
 )
 
 type stepObject struct {
@@ -10,7 +11,7 @@ type stepObject struct {
 	Status        string       `json:"status,omitempty"`
 	Stage         string       `json:"stage"`
 	ChildrenSteps []stepObject `json:"steps"`
-	Attachements  []Attachment `json:"attachments"`
+	Attachments   []attachment `json:"attachments"`
 	Parameters    []Parameter  `json:"parameters"`
 	Start         int64        `json:"start"`
 	Stop          int64        `json:"stop"`
@@ -22,6 +23,14 @@ func (s *stepObject) GetSteps() []stepObject {
 
 func (s *stepObject) AddStep(step stepObject) {
 	s.ChildrenSteps = append(s.ChildrenSteps, step)
+}
+
+func (s *stepObject) GetAttachments() []attachment {
+	return s.Attachments
+}
+
+func (s *stepObject) AddAttachment(attachment attachment) {
+	s.Attachments = append(s.Attachments, attachment)
 }
 
 // Step is meant to be wrapped around actions
@@ -57,7 +66,7 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 
 func newStep() *stepObject {
 	return &stepObject{
-		Attachements:  make([]Attachment, 0),
+		Attachments:   make([]attachment, 0),
 		ChildrenSteps: make([]stepObject, 0),
 		Parameters:    make([]Parameter, 0),
 	}

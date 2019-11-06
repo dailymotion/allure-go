@@ -24,7 +24,7 @@ type result struct {
 	StatusDetails *statusDetails `json:"statusDetails,omitempty"`
 	Stage         string         `json:"stage,omitempty"`
 	Steps         []stepObject   `json:"steps,omitempty"`
-	Attachments   []Attachment   `json:"attachments,omitempty"`
+	Attachments   []attachment   `json:"attachments,omitempty"`
 	Parameters    []Parameter    `json:"parameters,omitempty"`
 	Start         int64          `json:"start,omitempty"`
 	Stop          int64          `json:"stop,omitempty"`
@@ -45,7 +45,7 @@ type Before struct {
 	Start         int64          `json:"start,omitempty"`
 	Stop          int64          `json:"stop,omitempty"`
 	Steps         []stepObject   `json:"steps,omitempty"`
-	Attachments   []Attachment   `json:"attachments,omitempty"`
+	Attachments   []attachment   `json:"attachments,omitempty"`
 }
 
 // This interface provides functions required to manipulate children step records, used in the result object and
@@ -53,6 +53,19 @@ type Before struct {
 type hasSteps interface {
 	GetSteps() []stepObject
 	AddStep(step stepObject)
+}
+
+type HasAttachments interface {
+	GetAttachments() []attachment
+	AddAttachment(attachment attachment)
+}
+
+func (r *result) GetAttachments() []attachment {
+	return r.Attachments
+}
+
+func (r *result) AddAttachment(attachment attachment) {
+	r.Attachments = append(r.Attachments, attachment)
 }
 
 func (r *result) GetSteps() []stepObject {
