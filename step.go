@@ -2,6 +2,7 @@ package allure
 
 import (
 	"log"
+	"testing"
 
 	"github.com/jtolds/gls"
 )
@@ -46,9 +47,25 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 	if parameters == nil || len(parameters) > 0 {
 		step.Parameters = convertMapToParameters(parameters)
 	}
+	testFailedBeforeAction := false
 
 	defer func() {
+
 		step.Stop = getTimestampMs()
+		testFailedAfterAction := false
+		testInstance, ok := ctxMgr.GetValue(testInstanceKey)
+		if ok {
+			testFailedAfterAction = testInstance.(*testing.T).Failed()
+
+		}
+		if testFailedBeforeAction {
+			step.Status = "skipped"
+		} else {
+			if testFailedBeforeAction != testFailedAfterAction {
+				step.Status = "failed"
+			}
+		}
+
 		currentStepObj, ok := ctxMgr.GetValue(nodeKey)
 		if ok {
 			currentStep := currentStepObj.(hasSteps)
@@ -59,6 +76,10 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 
 	}()
 
+	testInstance, ok := ctxMgr.GetValue(testInstanceKey)
+	if ok {
+		testFailedBeforeAction = testInstance.(*testing.T).Failed()
+	}
 	ctxMgr.SetValues(gls.Values{nodeKey: step}, action)
 	step.Stage = "finished"
 	step.Status = "passed"

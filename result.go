@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jtolds/gls"
 	"github.com/pkg/errors"
 )
 
@@ -55,7 +54,7 @@ type hasSteps interface {
 	AddStep(step stepObject)
 }
 
-type HasAttachments interface {
+type hasAttachments interface {
 	GetAttachments() []attachment
 	AddAttachment(attachment attachment)
 }
@@ -74,39 +73,6 @@ func (r *result) GetSteps() []stepObject {
 
 func (r *result) AddStep(step stepObject) {
 	r.Steps = append(r.Steps, step)
-}
-
-// TestWithParameters executes a test and adds parameters to the Allure result object
-func TestWithParameters(t *testing.T, description string, parameters map[string]interface{}, testFunc func()) {
-	var r *result
-	r = newResult()
-	r.UUID = generateUUID()
-	r.Start = getTimestampMs()
-	r.Name = t.Name()
-	r.Description = description
-	r.setLabels(t)
-	r.Steps = make([]stepObject, 0)
-	if parameters == nil || len(parameters) > 0 {
-		r.Parameters = convertMapToParameters(parameters)
-	}
-
-	defer func() {
-		r.Stop = getTimestampMs()
-		r.Status = getTestStatus(t)
-		r.Stage = "finished"
-
-		err := r.writeResultsFile()
-		if err != nil {
-			log.Fatalf(fmt.Sprintf("Failed to write content of result to json file"), err)
-			os.Exit(1)
-		}
-	}()
-	ctxMgr.SetValues(gls.Values{"test_result_object": r, nodeKey: r}, testFunc)
-}
-
-//Test execute the test and creates an Allure result used by Allure reports
-func Test(t *testing.T, description string, testFunc func()) {
-	TestWithParameters(t, description, nil, testFunc)
 }
 
 func (r *result) setLabels(t *testing.T) {
