@@ -1,8 +1,9 @@
 package allure
 
 import (
-	"github.com/jtolds/gls"
 	"log"
+
+	"github.com/jtolds/gls"
 )
 
 type stepObject struct {
@@ -11,7 +12,7 @@ type stepObject struct {
 	Stage         string       `json:"stage"`
 	ChildrenSteps []stepObject `json:"steps"`
 	Attachments   []attachment `json:"attachments"`
-	Parameters    []string     `json:"parameters"`
+	Parameters    []Parameter  `json:"parameters"`
 	Start         int64        `json:"start"`
 	Stop          int64        `json:"stop"`
 }
@@ -32,15 +33,25 @@ func (s *stepObject) AddAttachment(attachment attachment) {
 	s.Attachments = append(s.Attachments, attachment)
 }
 
+// Step is meant to be wrapped around actions
 func Step(description string, action func()) {
+	StepWithParameter(description, nil, action)
+}
+
+// StepWithParameter is meant to be wrapped around actions with the purpose of logging the parameters
+func StepWithParameter(description string, parameters map[string]interface{}, action func()) {
 	step := newStep()
 	step.Name = description
 	step.Start = getTimestampMs()
+	if parameters == nil || len(parameters) > 0 {
+		step.Parameters = convertMapToParameters(parameters)
+	}
+
 	defer func() {
 		step.Stop = getTimestampMs()
 		currentStepObj, ok := ctxMgr.GetValue(nodeKey)
 		if ok {
-			currentStep := currentStepObj.(HasSteps)
+			currentStep := currentStepObj.(hasSteps)
 			currentStep.AddStep(*step)
 		} else {
 			log.Fatalln("could not retrieve current node")
@@ -57,5 +68,6 @@ func newStep() *stepObject {
 	return &stepObject{
 		Attachments:   make([]attachment, 0),
 		ChildrenSteps: make([]stepObject, 0),
+		Parameters:    make([]Parameter, 0),
 	}
 }

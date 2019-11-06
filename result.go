@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/jtolds/gls"
-
 	"github.com/pkg/errors"
 )
 
@@ -49,7 +48,9 @@ type Before struct {
 	Attachments   []attachment   `json:"attachments,omitempty"`
 }
 
-type HasSteps interface {
+// This interface provides functions required to manipulate children step records, used in the result object and
+// step object for recursive handling
+type hasSteps interface {
 	GetSteps() []stepObject
 	AddStep(step stepObject)
 }
@@ -75,13 +76,8 @@ func (r *result) AddStep(step stepObject) {
 	r.Steps = append(r.Steps, step)
 }
 
-type Parameter struct {
-	Name  string `json:"name,omitempty"`
-	Value string `json:"value,omitempty"`
-}
-
-//Test execute the test and creates an Allure result used by Allure reports
-func Test(t *testing.T, description string, testFunc func()) {
+// TestWithParameters executes a test and adds parameters to the Allure result object
+func TestWithParameters(t *testing.T, description string, parameters map[string]interface{}, testFunc func()) {
 	var r *result
 	r = newResult()
 	r.UUID = generateUUID()
@@ -90,6 +86,9 @@ func Test(t *testing.T, description string, testFunc func()) {
 	r.Description = description
 	r.setLabels(t)
 	r.Steps = make([]stepObject, 0)
+	if parameters == nil || len(parameters) > 0 {
+		r.Parameters = convertMapToParameters(parameters)
+	}
 
 	defer func() {
 		r.Stop = getTimestampMs()
@@ -103,6 +102,11 @@ func Test(t *testing.T, description string, testFunc func()) {
 		}
 	}()
 	ctxMgr.SetValues(gls.Values{"test_result_object": r, nodeKey: r}, testFunc)
+}
+
+//Test execute the test and creates an Allure result used by Allure reports
+func Test(t *testing.T, description string, testFunc func()) {
+	TestWithParameters(t, description, nil, testFunc)
 }
 
 func (r *result) setLabels(t *testing.T) {

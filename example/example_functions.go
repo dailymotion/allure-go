@@ -11,3 +11,7 @@ func doSomething() {
 func doSomethingNested() {
 	allure.Step("Because we can!", func() {})
 }
+
+func addSomeParameters(parameters map[string]interface{}) {
+	allure.StepWithParameter("Step with parameters", parameters, func() {})
+}
