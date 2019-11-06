@@ -50,13 +50,24 @@ export ALLURE_WORKSPACE_PATH=/another/path
 
 You will now get the relative path of your test files from your project root level.
 
-## Goals
+## Features available
 
-This project is an open source repository with multiple goals to achieve :
-- [x] Provide a first level of integration able to build a json container in an `allure-results` folder for a Test file and be able to generate an Allure report based on this json container.
-- [ ] Integrate Steps in the project. A Step() method will create the json object describing a step in the json container. This method can be called inside a method used by a test or directly in a test. It needs to find which container is related to the current test.
-- [ ] Integrate Attachments in the project. An attachment is a file in the `allure-results` folder that can be referred in a container or a step.
+This project is still in progress. Here is the list of available features :
+- It is possible to create a test object in the report with the `allure.Test()` method.
+- It is possible to create a step object inside a test object of the report with the `allure.Step()` method.
+- It is possible to pass parameters to a test object or a step object with the `allure.TestWithParameters()` and `allure.StepWithParameters()` methods.
+- It is possible to add attachments to a test object or a step object with the `allure.AddAttachment()` method (depending if it is called inside an `allure.Test()` wrapper or an `allure.Step()` wrapper).
 
-The end goal is to provide the same features than https://docs.qameta.io/allure/#_java
+## Improvements needed
 
-There are possible issues and open questions that we need to address. For example, how does the history work (an Allure report can display the result of previous executions).
+Here is the list of improvements that are needed for existing features :
+- [ ] Manage failure at step level : the project must be able to mark a Step as failed (red in the report) when an assertion fails. The assertion stacktrace must appear in the report.
+- [ ] Manage error at test and step level : the project must be able to mark a Test and Step as broken (orange in the report) when an error happens. The error stacktrace must appear in the report.
+- [ ] Add support of Links
+- [ ] Add support of Unknown status for Test object
+- [ ] Add support of Set up in Execution part of a Test
+- [ ] Add support of Tear down in Execution part of a Test
+- [ ] Add support of Severity
+- [ ] Add support of Flaky tag
+- [ ] Add support of Categories
+- [ ] Add support of Features
