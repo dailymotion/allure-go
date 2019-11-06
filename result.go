@@ -112,7 +112,15 @@ func Test(t *testing.T, description string, testFunc func()) {
 func (r *result) setLabels(t *testing.T) {
 	wsd := os.Getenv(wsPathEnvKey)
 
-	_, testFile, _, _ := runtime.Caller(2)
+	programCounters := make([]uintptr, 10)
+	callersCount := runtime.Callers(0, programCounters)
+	var testFile string
+	for i := 0; i < callersCount; i++ {
+		_, testFile, _, _ = runtime.Caller(i)
+		if strings.Contains(testFile, "_test.go") {
+			break
+		}
+	}
 	testPackage := strings.TrimSuffix(strings.Replace(strings.TrimPrefix(testFile, wsd+"/"), "/", ".", -1), ".go")
 
 	pkgLabel := Label{
