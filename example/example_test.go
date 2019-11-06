@@ -1,10 +1,9 @@
-package example_test
+package example
 
 import (
-	"github.com/dailymotion/allure-go/example"
-	"testing"
-
 	"github.com/dailymotion/allure-go"
+
+	"testing"
 )
 
 func TestPassedExample(t *testing.T) {
@@ -19,7 +18,7 @@ func TestPassedExample(t *testing.T) {
 func TestWithIntricateSubsteps(t *testing.T) {
 	allure.Test(t, "Test", func() {
 		allure.Step("Step 1", func() {
-			example.DoSomething()
+			doSomething()
 			allure.Step("Sub-step 1.1", func() {
 				t.Errorf("Failure")
 			})

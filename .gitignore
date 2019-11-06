@@ -18,3 +18,4 @@ vendor/
 
 # Intellij IDEA folder
 .idea/
+/maven_reference_project/
