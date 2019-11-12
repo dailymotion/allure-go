@@ -50,13 +50,11 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 	testFailedBeforeAction := false
 
 	defer func() {
-
 		step.Stop = getTimestampMs()
 		testFailedAfterAction := false
 		testInstance, ok := ctxMgr.GetValue(testInstanceKey)
 		if ok {
 			testFailedAfterAction = testInstance.(*testing.T).Failed()
-
 		}
 		if testFailedBeforeAction {
 			step.Status = "skipped"
@@ -73,7 +71,6 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 		} else {
 			log.Fatalln("could not retrieve current node")
 		}
-
 	}()
 
 	testInstance, ok := ctxMgr.GetValue(testInstanceKey)
