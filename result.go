@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fatih/camelcase"
 	"github.com/jtolds/gls"
 	"github.com/pkg/errors"
 )
@@ -83,6 +84,7 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 	r.UUID = generateUUID()
 	r.Start = getTimestampMs()
 	r.Name = t.Name()
+	r.FullName = strings.Join(camelcase.Split(t.Name()), " ")
 	r.Description = description
 	r.setLabels(t)
 	r.Steps = make([]stepObject, 0)
