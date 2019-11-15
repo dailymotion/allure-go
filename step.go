@@ -1,6 +1,7 @@
 package allure
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/jtolds/gls"
@@ -48,6 +49,8 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 	}
 
 	defer func() {
+		rec := recover()
+		fmt.Printf("Recovery object in step: %+v\n", rec)
 		step.Stop = getTimestampMs()
 		currentStepObj, ok := ctxMgr.GetValue(nodeKey)
 		if ok {
