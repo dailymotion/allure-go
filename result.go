@@ -75,7 +75,7 @@ func (r *result) AddStep(step stepObject) {
 	r.Steps = append(r.Steps, step)
 }
 
-func (r *result) setLabels(t *testing.T) {
+func (r *result) setLabels(t *testing.T, labels TestLabels) {
 	wsd := os.Getenv(wsPathEnvKey)
 
 	programCounters := make([]uintptr, 10)
@@ -89,21 +89,48 @@ func (r *result) setLabels(t *testing.T) {
 	}
 	testPackage := strings.TrimSuffix(strings.Replace(strings.TrimPrefix(testFile, wsd+"/"), "/", ".", -1), ".go")
 
-	pkgLabel := Label{
-		Name:  "package",
-		Value: testPackage,
+	r.addLabel("package", testPackage)
+	r.addLabel("testClass", testPackage)
+	r.addLabel("testMethod", t.Name())
+	if labels.Owner != "" {
+		r.addLabel("owner", labels.Owner)
 	}
-	r.Labels = append(r.Labels, pkgLabel)
-	classLabel := Label{
-		Name:  "testClass",
-		Value: testPackage,
+	if labels.Lead != "" {
+		r.addLabel("lead", labels.Lead)
 	}
-	r.Labels = append(r.Labels, classLabel)
-	methodLabel := Label{
-		Name:  "testMethod",
-		Value: t.Name(),
+	if labels.Epic != "" {
+		r.addLabel("epic", labels.Epic)
 	}
-	r.Labels = append(r.Labels, methodLabel)
+	if labels.Story != nil && len(labels.Story) > 0 {
+		for _, v := range labels.Story {
+			r.addLabel("story", v)
+		}
+	}
+	if labels.Feature != nil && len(labels.Feature) > 0 {
+		for _, v := range labels.Feature {
+			r.addLabel("feature", v)
+		}
+	}
+	if hostname, err := os.Hostname(); err == nil {
+		r.addLabel("host", hostname)
+	}
+
+	r.addLabel("language", "golang")
+
+	//TODO: these labels are available, but should be handled separately.
+
+	//	ParentSuite string
+	//	Suite       string
+	//	SubSuite    string
+	//	Thread      string
+	//	Framework   string
+}
+
+func (r *result) addLabel(name string, value string) {
+	r.Labels = append(r.Labels, Label{
+		Name:  name,
+		Value: value,
+	})
 }
 
 func (r *result) writeResultsFile() error {

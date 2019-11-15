@@ -34,7 +34,7 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 	r.Name = t.Name()
 	r.FullName = strings.Join(camelcase.Split(t.Name()), " ")
 	r.Description = description
-	r.setLabels(t)
+	r.setLabels(t, labels)
 	r.Steps = make([]stepObject, 0)
 	if parameters == nil || len(parameters) > 0 {
 		r.Parameters = convertMapToParameters(parameters)
