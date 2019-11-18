@@ -10,9 +10,8 @@ import (
 )
 
 var (
-	ctxMgr     *gls.ContextManager
-	wsd        string
-	resultPath string
+	ctxMgr *gls.ContextManager
+	wsd    string
 )
 
 const (
@@ -22,13 +21,28 @@ const (
 	nodeKey           = "current_step_container"
 )
 
+var resultsPath string
+
 func init() {
 	ctxMgr = gls.NewContextManager()
 	if envFilePath := os.Getenv(envFileKey); envFilePath != "" {
 		envFilesStrings := strings.Split(envFilePath, "/")
-		resultsPath := os.Getenv(resultsPathEnvKey)
-		if _, err := copy(envFilePath, resultsPath+"/allure-results/"+envFilesStrings[len(envFilesStrings)-1]); err != nil {
-			log.Fatalf("Could not copy the environment file, %f", err)
+
+		resultsPathEnv := os.Getenv(resultsPathEnvKey)
+		if resultsPathEnv == "" {
+			log.Fatalf("%s environment variable cannot be empty", resultsPathEnvKey)
+		}
+		resultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+
+		if _, err := os.Stat(resultsPath); os.IsNotExist(err) {
+			err = os.Mkdir(resultsPath, 0777)
+			if err != nil {
+				log.Fatal("Failed to create allure-results folder", err)
+			}
+		}
+
+		if _, err := copy(envFilePath, resultsPath+"/"+envFilesStrings[len(envFilesStrings)-1]); err != nil {
+			log.Fatal("Could not copy the environment file", err)
 		}
 	}
 }

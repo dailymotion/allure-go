@@ -141,23 +141,12 @@ func (r *result) setLabels(t *testing.T) {
 }
 
 func (r *result) writeResultsFile() error {
-	resultsPathEnv := os.Getenv(resultsPathEnvKey)
-	if resultsPathEnv == "" {
-		log.Fatalf("%s environment variable cannot be empty", resultsPathEnvKey)
-	}
-	resultPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
-
 	j, err := json.Marshal(r)
 	if err != nil {
 		return errors.Wrap(err, "Failed to marshall result into JSON")
 	}
-	if _, err := os.Stat(resultPath); os.IsNotExist(err) {
-		err = os.Mkdir(resultPath, 0777)
-		if err != nil {
-			return errors.Wrap(err, "Failed to create allure-results folder")
-		}
-	}
-	err = ioutil.WriteFile(fmt.Sprintf("%s/%s-result.json", resultPath, r.UUID), j, 0777)
+
+	err = ioutil.WriteFile(fmt.Sprintf("%s/%s-result.json", resultsPath, r.UUID), j, 0777)
 	if err != nil {
 		return errors.Wrap(err, "Failed to write in file")
 	}
