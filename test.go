@@ -2,6 +2,7 @@ package allure
 
 import (
 	"fmt"
+	"github.com/dailymotion/allure-go/severity"
 	"github.com/fatih/camelcase"
 	"github.com/jtolds/gls"
 	"log"
@@ -14,6 +15,7 @@ type TestLabels struct {
 	Epic        string
 	Lead        string
 	Owner       string
+	Severity    severity.Severity
 	Story       []string
 	Feature     []string
 	ParentSuite string

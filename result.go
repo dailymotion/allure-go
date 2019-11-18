@@ -101,6 +101,9 @@ func (r *result) setLabels(t *testing.T, labels TestLabels) {
 	if labels.Epic != "" {
 		r.addLabel("epic", labels.Epic)
 	}
+	if labels.Severity != "" {
+		r.addLabel("severity", string(labels.Severity))
+	}
 	if labels.Story != nil && len(labels.Story) > 0 {
 		for _, v := range labels.Story {
 			r.addLabel("story", v)
