@@ -1,6 +1,7 @@
 package allure
 
 import (
+	"fmt"
 	"log"
 	"testing"
 
@@ -50,6 +51,8 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 	testFailedBeforeAction := false
 
 	defer func() {
+		rec := recover()
+		fmt.Printf("Recovery object in step: %+v\n", rec)
 		step.Stop = getTimestampMs()
 		testFailedAfterAction := false
 		testInstance, ok := ctxMgr.GetValue(testInstanceKey)
