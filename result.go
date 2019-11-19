@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jtolds/gls"
 	"github.com/pkg/errors"
 )
 
@@ -76,40 +75,7 @@ func (r *result) AddStep(step stepObject) {
 	r.Steps = append(r.Steps, step)
 }
 
-// TestWithParameters executes a test and adds parameters to the Allure result object
-func TestWithParameters(t *testing.T, description string, parameters map[string]interface{}, testFunc func()) {
-	var r *result
-	r = newResult()
-	r.UUID = generateUUID()
-	r.Start = getTimestampMs()
-	r.Name = t.Name()
-	r.Description = description
-	r.setLabels(t)
-	r.Steps = make([]stepObject, 0)
-	if parameters == nil || len(parameters) > 0 {
-		r.Parameters = convertMapToParameters(parameters)
-	}
-
-	defer func() {
-		r.Stop = getTimestampMs()
-		r.Status = getTestStatus(t)
-		r.Stage = "finished"
-
-		err := r.writeResultsFile()
-		if err != nil {
-			log.Fatalf(fmt.Sprintf("Failed to write content of result to json file"), err)
-			os.Exit(1)
-		}
-	}()
-	ctxMgr.SetValues(gls.Values{"test_result_object": r, nodeKey: r}, testFunc)
-}
-
-//Test execute the test and creates an Allure result used by Allure reports
-func Test(t *testing.T, description string, testFunc func()) {
-	TestWithParameters(t, description, nil, testFunc)
-}
-
-func (r *result) setLabels(t *testing.T) {
+func (r *result) setLabels(t *testing.T, labels TestLabels) {
 	wsd := os.Getenv(wsPathEnvKey)
 
 	programCounters := make([]uintptr, 10)
@@ -123,21 +89,51 @@ func (r *result) setLabels(t *testing.T) {
 	}
 	testPackage := strings.TrimSuffix(strings.Replace(strings.TrimPrefix(testFile, wsd+"/"), "/", ".", -1), ".go")
 
-	pkgLabel := Label{
-		Name:  "package",
-		Value: testPackage,
+	r.addLabel("package", testPackage)
+	r.addLabel("testClass", testPackage)
+	r.addLabel("testMethod", t.Name())
+	if labels.Owner != "" {
+		r.addLabel("owner", labels.Owner)
 	}
-	r.Labels = append(r.Labels, pkgLabel)
-	classLabel := Label{
-		Name:  "testClass",
-		Value: testPackage,
+	if labels.Lead != "" {
+		r.addLabel("lead", labels.Lead)
 	}
-	r.Labels = append(r.Labels, classLabel)
-	methodLabel := Label{
-		Name:  "testMethod",
-		Value: t.Name(),
+	if labels.Epic != "" {
+		r.addLabel("epic", labels.Epic)
 	}
-	r.Labels = append(r.Labels, methodLabel)
+	if labels.Severity != "" {
+		r.addLabel("severity", string(labels.Severity))
+	}
+	if labels.Story != nil && len(labels.Story) > 0 {
+		for _, v := range labels.Story {
+			r.addLabel("story", v)
+		}
+	}
+	if labels.Feature != nil && len(labels.Feature) > 0 {
+		for _, v := range labels.Feature {
+			r.addLabel("feature", v)
+		}
+	}
+	if hostname, err := os.Hostname(); err == nil {
+		r.addLabel("host", hostname)
+	}
+
+	r.addLabel("language", "golang")
+
+	//TODO: these labels are available, but should be handled separately.
+
+	//	ParentSuite string
+	//	Suite       string
+	//	SubSuite    string
+	//	Thread      string
+	//	Framework   string
+}
+
+func (r *result) addLabel(name string, value string) {
+	r.Labels = append(r.Labels, Label{
+		Name:  name,
+		Value: value,
+	})
 }
 
 func (r *result) writeResultsFile() error {

@@ -3,6 +3,7 @@ package example
 import (
 	"fmt"
 	"github.com/dailymotion/allure-go"
+	"github.com/dailymotion/allure-go/severity"
 	"testing"
 )
 
@@ -29,7 +30,9 @@ func TestAllureParameterized(t *testing.T) {
 				"Test with parameters",
 				map[string]interface{}{
 					"counter": i,
-				}, func() {
+				},
+				allure.TestLabels{},
+				func() {
 
 				})
 		})
@@ -40,6 +43,7 @@ func TestAllureParametersExample(t *testing.T) {
 	allure.TestWithParameters(t,
 		"This is a test to show allure implementation with a passing test",
 		parameters,
+		allure.TestLabels{},
 		func() {
 			allure.Step(fmt.Sprintf("Number: %d", parameters["int"]), func() {})
 			allure.Step(fmt.Sprintf("String: %s", parameters["string"]), func() {})
@@ -76,5 +80,21 @@ func TestAllureParameterTypes(t *testing.T) {
 			"complex64":  complex(float32(2), float32(-2)),
 			"complex128": complex(float64(2), float64(-2)),
 		},
+		allure.TestLabels{},
 		func() {})
+}
+
+func TestAllureWithLabels(t *testing.T) {
+	allure.TestWithParameters(t, "Test with labels",
+		nil,
+		allure.TestLabels{
+			Epic:     "Epic Epic of Epicness",
+			Lead:     "Duke Nukem",
+			Owner:    "Rex Powercolt",
+			Severity: severity.Critical,
+			Story:    []string{"story1", "story2"},
+			Feature:  []string{"feature1", "feature2"},
+		}, func() {
+
+		})
 }
