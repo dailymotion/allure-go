@@ -1,7 +1,6 @@
 package allure
 
 import (
-	"fmt"
 	"log"
 	"testing"
 
@@ -48,38 +47,23 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 	if parameters == nil || len(parameters) > 0 {
 		step.Parameters = convertMapToParameters(parameters)
 	}
-	testFailedBeforeAction := false
 
 	defer func() {
-		rec := recover()
-		fmt.Printf("Recovery object in step: %+v\n", rec)
 		step.Stop = getTimestampMs()
-		testFailedAfterAction := false
-		testInstance, ok := ctxMgr.GetValue(testInstanceKey)
-		if ok {
-			testFailedAfterAction = testInstance.(*testing.T).Failed()
-		}
-		if testFailedBeforeAction {
-			step.Status = "skipped"
-		} else {
-			if testFailedBeforeAction != testFailedAfterAction {
+		if testInstance, ok := ctxMgr.GetValue(testInstanceKey); ok {
+			if testInstance.(*testing.T).Failed() {
 				step.Status = "failed"
 			}
 		}
 
-		currentStepObj, ok := ctxMgr.GetValue(nodeKey)
-		if ok {
+		if currentStepObj, ok := ctxMgr.GetValue(nodeKey); ok {
 			currentStep := currentStepObj.(hasSteps)
 			currentStep.AddStep(*step)
 		} else {
-			log.Fatalln("could not retrieve current node")
+			log.Fatalln("could not retrieve current allure node")
 		}
 	}()
 
-	testInstance, ok := ctxMgr.GetValue(testInstanceKey)
-	if ok {
-		testFailedBeforeAction = testInstance.(*testing.T).Failed()
-	}
 	ctxMgr.SetValues(gls.Values{nodeKey: step}, action)
 	step.Stage = "finished"
 	step.Status = "passed"
