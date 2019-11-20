@@ -85,3 +85,4 @@ Here is the list of improvements that are needed for existing features :
 - [ ] Add support of Flaky tag
 - [ ] Add support of Categories
 - [ ] Add support of Features
+- [X] Add support for environment files
