@@ -61,7 +61,7 @@ This project is still in progress. Here is the list of available features :
 ## Improvements needed
 
 Here is the list of improvements that are needed for existing features :
-- [ ] Manage failure at step level : the project must be able to mark a Step as failed (red in the report) when an assertion fails. The assertion stacktrace must appear in the report.
+- [X] Manage failure at step level : the project must be able to mark a Step as failed (red in the report) when an assertion fails. The assertion stacktrace must appear in the report.
 - [ ] Manage error at test and step level : the project must be able to mark a Test and Step as broken (orange in the report) when an error happens. The error stacktrace must appear in the report.
 - [ ] Add support of Links
 - [ ] Add support of Unknown status for Test object

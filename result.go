@@ -54,7 +54,7 @@ type hasSteps interface {
 	AddStep(step stepObject)
 }
 
-type HasAttachments interface {
+type hasAttachments interface {
 	GetAttachments() []attachment
 	AddAttachment(attachment attachment)
 }

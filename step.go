@@ -1,8 +1,8 @@
 package allure
 
 import (
-	"fmt"
 	"log"
+	"testing"
 
 	"github.com/jtolds/gls"
 )
@@ -49,17 +49,19 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 	}
 
 	defer func() {
-		rec := recover()
-		fmt.Printf("Recovery object in step: %+v\n", rec)
 		step.Stop = getTimestampMs()
-		currentStepObj, ok := ctxMgr.GetValue(nodeKey)
-		if ok {
+		if testInstance, ok := ctxMgr.GetValue(testInstanceKey); ok {
+			if testInstance.(*testing.T).Failed() {
+				step.Status = "failed"
+			}
+		}
+
+		if currentStepObj, ok := ctxMgr.GetValue(nodeKey); ok {
 			currentStep := currentStepObj.(hasSteps)
 			currentStep.AddStep(*step)
 		} else {
-			log.Fatalln("could not retrieve current node")
+			log.Fatalln("could not retrieve current allure node")
 		}
-
 	}()
 
 	ctxMgr.SetValues(gls.Values{nodeKey: step}, action)

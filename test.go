@@ -53,7 +53,11 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 			os.Exit(1)
 		}
 	}()
-	ctxMgr.SetValues(gls.Values{"test_result_object": r, nodeKey: r}, testFunc)
+	ctxMgr.SetValues(gls.Values{
+		testResultKey:   r,
+		nodeKey:         r,
+		testInstanceKey: t,
+	}, testFunc)
 }
 
 //Test execute the test and creates an Allure result used by Allure reports

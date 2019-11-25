@@ -24,8 +24,8 @@ func AddAttachment(name string, mimeType MimeType, content []byte) error {
 	if err != nil {
 		return errors.Wrap(err, "Failed to create an attachment file")
 	}
-	if hasAttachments, ok := ctxMgr.GetValue(nodeKey); ok {
-		hasAttachments.(HasAttachments).AddAttachment(*attachment)
+	if node, ok := ctxMgr.GetValue(nodeKey); ok {
+		node.(hasAttachments).AddAttachment(*attachment)
 	}
 
 	return nil
