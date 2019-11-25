@@ -142,24 +142,13 @@ func (r *result) setLabels(t *testing.T) {
 }
 
 func (r *result) writeResultsFile() error {
-	resultsPathEnv := os.Getenv(resultsPathEnvKey)
-	once.Do(copyEnvFileIfExists)
-	if resultsPathEnv == "" {
-		log.Fatalf("%s environment variable cannot be empty", resultsPathEnvKey)
-	}
-	resultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+	createFolderOnce.Do(createFolderIfNotExists)
+	copyEnvFileOnce.Do(copyEnvFileIfExists)
 
 	j, err := json.Marshal(r)
 	if err != nil {
 		return errors.Wrap(err, "Failed to marshall result into JSON")
 	}
-	if _, err := os.Stat(resultsPath); os.IsNotExist(err) {
-		err = os.Mkdir(resultsPath, 0777)
-		if err != nil {
-			return errors.Wrap(err, "Failed to create allure-results folder")
-		}
-	}
-
 	err = ioutil.WriteFile(fmt.Sprintf("%s/%s-result.json", resultsPath, r.UUID), j, 0777)
 	if err != nil {
 		return errors.Wrap(err, "Failed to write in file")
@@ -178,26 +167,30 @@ func getTimestampMs() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
 }
 
+func createFolderIfNotExists() {
+	resultsPathEnv := os.Getenv(resultsPathEnvKey)
+	if resultsPathEnv == "" {
+		log.Printf("environment variable %s cannot be empty\n", resultsPathEnvKey)
+	}
+	resultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+
+	if _, err := os.Stat(resultsPath); os.IsNotExist(err) {
+		err = os.Mkdir(resultsPath, 0777)
+		if err != nil {
+			log.Println(err, "Failed to create allure-results folder")
+		}
+	}
+}
+
 func copyEnvFileIfExists() {
 	if envFilePath := os.Getenv(envFileKey); envFilePath != "" {
 		envFilesStrings := strings.Split(envFilePath, "/")
-
-		resultsPathEnv := os.Getenv(resultsPathEnvKey)
-		if resultsPathEnv == "" {
-			log.Fatalf("%s environment variable cannot be empty", resultsPathEnvKey)
-		}
-		resultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
-
-		if _, err := os.Stat(resultsPath); os.IsNotExist(err) {
-			err = os.Mkdir(resultsPath, 0777)
-			if err != nil {
-				log.Fatal("Failed to create allure-results folder", err)
+		if resultsPath != "" {
+			if _, err := copy(envFilePath, resultsPath+"/"+envFilesStrings[len(envFilesStrings)-1]); err != nil {
+				log.Println("Could not copy the environment file", err)
 			}
 		}
 
-		if _, err := copy(envFilePath, resultsPath+"/"+envFilesStrings[len(envFilesStrings)-1]); err != nil {
-			log.Fatal("Could not copy the environment file", err)
-		}
 	}
 }
 

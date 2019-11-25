@@ -6,10 +6,11 @@ import (
 )
 
 var (
-	ctxMgr      *gls.ContextManager
-	wsd         string
-	resultsPath string
-	once        sync.Once
+	ctxMgr           *gls.ContextManager
+	wsd              string
+	resultsPath      string
+	createFolderOnce sync.Once
+	copyEnvFileOnce  sync.Once
 )
 
 const (
