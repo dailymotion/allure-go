@@ -3,6 +3,7 @@ package allure
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -137,23 +138,14 @@ func (r *result) addLabel(name string, value string) {
 }
 
 func (r *result) writeResultsFile() error {
-	resultsPathEnv := os.Getenv(resultsPathEnvKey)
-	if resultsPathEnv == "" {
-		log.Fatalf("%s environment variable cannot be empty", resultsPathEnvKey)
-	}
-	resultPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+	createFolderOnce.Do(createFolderIfNotExists)
+	copyEnvFileOnce.Do(copyEnvFileIfExists)
 
 	j, err := json.Marshal(r)
 	if err != nil {
 		return errors.Wrap(err, "Failed to marshall result into JSON")
 	}
-	if _, err := os.Stat(resultPath); os.IsNotExist(err) {
-		err = os.Mkdir(resultPath, 0777)
-		if err != nil {
-			return errors.Wrap(err, "Failed to create allure-results folder")
-		}
-	}
-	err = ioutil.WriteFile(fmt.Sprintf("%s/%s-result.json", resultPath, r.UUID), j, 0777)
+	err = ioutil.WriteFile(fmt.Sprintf("%s/%s-result.json", resultsPath, r.UUID), j, 0777)
 	if err != nil {
 		return errors.Wrap(err, "Failed to write in file")
 	}
@@ -169,4 +161,65 @@ func newResult() *result {
 
 func getTimestampMs() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
+}
+
+func createFolderIfNotExists() {
+	resultsPathEnv := os.Getenv(resultsPathEnvKey)
+	if resultsPathEnv == "" {
+		log.Printf("environment variable %s cannot be empty\n", resultsPathEnvKey)
+	}
+	resultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+
+	if _, err := os.Stat(resultsPath); os.IsNotExist(err) {
+		err = os.Mkdir(resultsPath, 0777)
+		if err != nil {
+			log.Println(err, "Failed to create allure-results folder")
+		}
+	}
+}
+
+func copyEnvFileIfExists() {
+	if envFilePath := os.Getenv(envFileKey); envFilePath != "" {
+		envFilesStrings := strings.Split(envFilePath, "/")
+		if resultsPath != "" {
+			if _, err := copy(envFilePath, resultsPath+"/"+envFilesStrings[len(envFilesStrings)-1]); err != nil {
+				log.Println("Could not copy the environment file", err)
+			}
+		}
+
+	}
+}
+
+func copy(src, dst string) (int64, error) {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		return 0, err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return 0, err
+	}
+	defer func() {
+		if err = source.Close(); err != nil {
+			log.Fatalf("Could not close the stream for the environment file, %f", err)
+		}
+	}()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return 0, err
+	}
+	defer func() {
+		if err = destination.Close(); err != nil {
+			log.Fatalf("Could not close the stream for the destination of the environment file, %f", err)
+		}
+	}()
+
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
 }

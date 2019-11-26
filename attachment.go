@@ -36,16 +36,9 @@ func (a *attachment) writeAttachmentFile() error {
 	if resultsPathEnv == "" {
 		log.Fatalf("%s environment variable cannot be empty", resultsPathEnvKey)
 	}
-	resultPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
 
-	if _, err := os.Stat(resultPath); os.IsNotExist(err) {
-		err = os.Mkdir(resultPath, 0777)
-		if err != nil {
-			return errors.Wrap(err, "Failed to create allure-results folder")
-		}
-	}
 	a.Source = fmt.Sprintf("%s-attachment", a.uuid)
-	err := ioutil.WriteFile(fmt.Sprintf("%s/%s-attachment", resultPath, a.uuid), a.content, 0777)
+	err := ioutil.WriteFile(fmt.Sprintf("%s/%s-attachment", resultsPath, a.uuid), a.content, 0777)
 	if err != nil {
 		return errors.Wrap(err, "Failed to write in file")
 	}

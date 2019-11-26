@@ -12,7 +12,9 @@ $ go get -u github.com/dailymotion/allure-go
 
 This will retrieve the library.
 
-## Using
+## Usage
+
+### Specifying allure-results folder location
 
 First of all, you need to set an environment variable to define the `allure-results` folder location:
 ```
@@ -21,6 +23,18 @@ export ALLURE_RESULTS_PATH=/some/path
 This should be the path where the `allure-results` folder exists or should be created, not the path of the folder itself.
 
 The `allure-results` folder is automatically created if it doesn't exist with `drwxr-xr-x` file system permission.
+
+### Using environment file
+
+Allure reporting tool allows putting run-specific properties in the report provided 
+by `environment.properties` or `environment.xml` file.
+
+In order to take advantage of this feature, set an environment variable to specify the location of the file:
+```
+export ALLURE_ENVIRONMENT_FILE_PATH=/path/to/file/environment.properties
+```                                                                     
+
+### Examples
 
 To implement this library in your tests, follow the [examples](example/example_test.go).
 
@@ -71,3 +85,4 @@ Here is the list of improvements that are needed for existing features :
 - [ ] Add support of Flaky tag
 - [ ] Add support of Categories
 - [ ] Add support of Features
+- [X] Add support for environment files
