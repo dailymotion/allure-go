@@ -28,25 +28,10 @@ type result struct {
 	Parameters    []Parameter    `json:"parameters,omitempty"`
 	Start         int64          `json:"start,omitempty"`
 	Stop          int64          `json:"stop,omitempty"`
-	Children      []string       `json:"children,omitempty"`
-	Befores       []Before       `json:"befores,omitempty"`
 	FullName      string         `json:"fullName,omitempty"`
 	Labels        []Label        `json:"labels,omitempty"`
 }
 type FailureMode string
-
-//Before defines a step
-type Before struct {
-	Name          string         `json:"name,omitempty"`
-	Status        string         `json:"status,omitempty"`
-	StatusDetails *statusDetails `json:"statusDetails,omitempty"`
-	Stage         string         `json:"stage,omitempty"`
-	Description   string         `json:"description,omitempty"`
-	Start         int64          `json:"start,omitempty"`
-	Stop          int64          `json:"stop,omitempty"`
-	Steps         []stepObject   `json:"steps,omitempty"`
-	Attachments   []attachment   `json:"attachments,omitempty"`
-}
 
 // This interface provides functions required to manipulate children step records, used in the result object and
 // step object for recursive handling
