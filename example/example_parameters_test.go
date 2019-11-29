@@ -2,9 +2,10 @@ package example
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/dailymotion/allure-go"
 	"github.com/dailymotion/allure-go/severity"
-	"testing"
 )
 
 type SampleObject struct {
@@ -56,7 +57,7 @@ func TestAllureStepWithParameters(t *testing.T) {
 		for i := 0; i < 5; i++ {
 			allure.StepWithParameter("Step with parameters", map[string]interface{}{"counter": i}, func() {})
 		}
-
+		allure.SkipStepWithParameter("Step with parameters", "Skip this step with parameters", map[string]interface{}{"counter": 6}, func() {})
 	})
 }
 
