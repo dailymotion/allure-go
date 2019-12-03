@@ -44,7 +44,9 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 
 	defer func() {
 		r.Stop = getTimestampMs()
-		r.Status = getTestStatus(t)
+		if r.Status == "" {
+			r.Status = getTestStatus(t)
+		}
 		r.Stage = "finished"
 
 		err := r.writeResultsFile()

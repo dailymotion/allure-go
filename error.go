@@ -1,36 +1,64 @@
 package allure
 
 import (
+	"fmt"
 	"runtime/debug"
 	"strings"
 	"testing"
 )
 
-func Error(err error) {
-	allureError(err, false)
+// Fail sets the current step as well as the entire test script as failed and stores the stack trace in the result object.
+// Script execution is not interrupted, script would still run after this call.
+func Fail(err error) {
+	allureError(err, "failed", false)
 }
 
-func ErrorNow(err error) {
-	allureError(err, true)
+// FailNow sets the current step as well as the entire test script as failed and stores the stack trace in the result object.
+// Script execution is interrupted, script stops immediately.
+func FailNow(err error) {
+	allureError(err, "failed", true)
 }
 
-func allureError(err error, now bool) {
-	if testResult, ok := ctxMgr.GetValue(testResultKey); ok {
-		testStatusDetails := testResult.(*result).StatusDetails
-		if testStatusDetails == nil {
-			testStatusDetails = &statusDetails{}
-		}
-		testStatusDetails.Trace = filterStackTrace(debug.Stack())
-		testStatusDetails.Message = err.Error()
-		testResult.(*result).StatusDetails = testStatusDetails
-	}
-	if testInstance, ok := ctxMgr.GetValue(testInstanceKey); ok {
-		if now {
-			testInstance.(*testing.T).FailNow()
-		} else {
-			testInstance.(*testing.T).Fail()
-		}
-	}
+// Break sets the current step as well as the entire test script as broken and stores the stack trace in the result object.
+// Script execution is not interrupted, script would still run after this call.
+func Break(err error) {
+	allureError(err, "broken", false)
+}
+
+// BreakNow sets the current step as well as the entire test script as broken and stores the stack trace in the result object.
+// Script execution is interrupted, script stops immediately.
+func BreakNow(err error) {
+	allureError(err, "broken", true)
+}
+
+func allureError(err error, status string, now bool) {
+	manipulateOnObjectFromCtx(
+		testResultKey,
+		func(testResult interface{}) {
+			testStatusDetails := testResult.(*result).StatusDetails
+			if testStatusDetails == nil {
+				testStatusDetails = &statusDetails{}
+			}
+			testStatusDetails.Trace = filterStackTrace(debug.Stack())
+			testStatusDetails.Message = err.Error()
+			testResult.(*result).StatusDetails = testStatusDetails
+			testResult.(*result).Status = status
+		})
+	manipulateOnObjectFromCtx(
+		nodeKey,
+		func(node interface{}) {
+			node.(hasStatus).SetStatus(status)
+			fmt.Printf("Set %+v status to %s\n", node, status)
+		})
+	manipulateOnObjectFromCtx(
+		testInstanceKey,
+		func(testInstance interface{}) {
+			if now {
+				testInstance.(*testing.T).FailNow()
+			} else {
+				testInstance.(*testing.T).Fail()
+			}
+		})
 }
 
 func filterStackTrace(stack []byte) string {
