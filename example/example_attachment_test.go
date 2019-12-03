@@ -20,7 +20,7 @@ func TestImageAttachmentToStep(t *testing.T) {
 		allure.Step("adding an image attachment", func() {
 			dat, err := ioutil.ReadFile("../Coryphaena_hippurus.png")
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
 			}
 			_ = allure.AddAttachment("mahi-mahi", allure.ImagePng, dat)
 		})
@@ -37,7 +37,7 @@ func TestImageAttachment(t *testing.T) {
 	allure.Test(t, "testing an image attachment", func() {
 		dat, err := ioutil.ReadFile("../Coryphaena_hippurus.png")
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 		_ = allure.AddAttachment("mahi-mahi", allure.ImagePng, dat)
 	})

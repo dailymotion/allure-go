@@ -219,7 +219,7 @@ func copy(src, dst string) (int64, error) {
 	}
 	defer func() {
 		if err = source.Close(); err != nil {
-			log.Fatalf("Could not close the stream for the environment file, %f", err)
+			log.Printf("Could not close the stream for the environment file, %f\n", err)
 		}
 	}()
 
@@ -229,7 +229,7 @@ func copy(src, dst string) (int64, error) {
 	}
 	defer func() {
 		if err = destination.Close(); err != nil {
-			log.Fatalf("Could not close the stream for the destination of the environment file, %f", err)
+			log.Printf("Could not close the stream for the destination of the environment file, %f\n", err)
 		}
 	}()
 
