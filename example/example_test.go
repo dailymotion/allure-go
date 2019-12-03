@@ -23,6 +23,7 @@ func TestWithIntricateSubsteps(t *testing.T) {
 				t.Errorf("Failure")
 			})
 			allure.Step("Sub-step 1.2", func() {})
+			allure.SkipStep("Sub-step 1.3", "Skip this step because of defect to be fixed", func() {})
 		})
 		allure.Step("Step 2", func() {
 			allure.Step("Sub-step 2.1", func() {
