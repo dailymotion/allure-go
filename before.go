@@ -1,40 +1,52 @@
 package allure
 
-type Container struct {
-	UUID        string            `json:"uuid"`
-	Name        string            `json:"name"`
-	Children    []string          `json:"children"`
-	Description string            `json:"description"`
-	Befores     []helperContainer `json:"befores"`
-	Afters      []helperContainer `json:"afters"`
-	Links       []string          `json:"links"`
-	Start       int64             `json:"start"`
-	Stop        int64             `json:"stop"`
+import (
+	"github.com/jtolds/gls"
+	"log"
+	"testing"
+)
+
+// BeforeWithParameters executes a setup phase of the test and adds parameters to the Allure container object
+func BeforeWithParameters(t *testing.T, description string, parameters map[string]interface{}, labels TestLabels, testFunc func()) {
+	testPhaseObject := getCurrentTestPhaseObject(t)
+	if testPhaseObject.Test != nil {
+		log.Printf("Test's \"%s\" allure setup is being executed after allure test!\n", t.Name())
+	}
+	before := newBefore()
+	testPhaseObject.Befores = append(testPhaseObject.Befores, before)
+	beforeSubContainer := before.Befores[0]
+
+	before.UUID = generateUUID()
+	beforeSubContainer.Start = getTimestampMs()
+	before.Name = t.Name()
+
+	before.Description = description
+
+	beforeSubContainer.Steps = make([]stepObject, 0)
+	if parameters == nil || len(parameters) > 0 {
+		beforeSubContainer.Parameters = convertMapToParameters(parameters)
+	}
+
+	defer func() {
+		beforeSubContainer.Stop = getTimestampMs()
+		beforeSubContainer.Status = getTestStatus(t)
+		beforeSubContainer.Stage = "finished"
+
+	}()
+	ctxMgr.SetValues(gls.Values{
+		testResultKey:   beforeSubContainer,
+		nodeKey:         beforeSubContainer,
+		testInstanceKey: t,
+	}, testFunc)
 }
 
-func (container Container) writeResultsFile() error {
-	//TODO: implement that
-	return nil
+//Before executes the setup phase of the test and creates an Allure container object used by Allure reports
+func Before(t *testing.T, description string, testFunc func()) {
+	BeforeWithParameters(t, description, nil, TestLabels{}, testFunc)
 }
 
-//helperContainer defines a step
-type helperContainer struct {
-	Name          string         `json:"name,omitempty"`
-	Status        string         `json:"status,omitempty"`
-	StatusDetails *statusDetails `json:"statusDetails,omitempty"`
-	Stage         string         `json:"stage,omitempty"`
-	Description   string         `json:"description,omitempty"`
-	Start         int64          `json:"start,omitempty"`
-	Stop          int64          `json:"stop,omitempty"`
-	Steps         []stepObject   `json:"steps,omitempty"`
-	Attachments   []attachment   `json:"attachments,omitempty"`
-	Parameters    []Parameter    `json:"parameters,omitempty"`
-}
-
-func newHelper() *helperContainer {
-	return &helperContainer{
-		Steps:       make([]stepObject, 0),
-		Attachments: make([]attachment, 0),
-		Parameters:  make([]Parameter, 0),
+func newBefore() *container {
+	return &container{
+		Befores: []*subContainer{newHelper()},
 	}
 }

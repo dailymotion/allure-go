@@ -1,12 +1,10 @@
 package allure
 
 import (
-	"fmt"
 	"github.com/dailymotion/allure-go/severity"
 	"github.com/fatih/camelcase"
 	"github.com/jtolds/gls"
 	"log"
-	"os"
 	"strings"
 	"testing"
 )
@@ -43,14 +41,22 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 	}
 
 	defer func() {
+		getCurrentTestPhaseObject(t).Test = r
 		r.Stop = getTimestampMs()
 		r.Status = getTestStatus(t)
 		r.Stage = "finished"
 
 		err := r.writeResultsFile()
 		if err != nil {
-			log.Fatalf(fmt.Sprintf("Failed to write content of result to json file"), err)
-			os.Exit(1)
+			log.Println("Failed to write content of result to json file", err)
+		}
+		setups := getCurrentTestPhaseObject(t).Befores
+		for _, setup := range setups {
+			setup.Children = append(setup.Children, r.UUID)
+			err := setup.writeResultsFile()
+			if err != nil {
+				log.Println("Failed to write content of result to json file", err)
+			}
 		}
 	}()
 	ctxMgr.SetValues(gls.Values{
