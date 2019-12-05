@@ -32,7 +32,7 @@ func TestAllureParameterized(t *testing.T) {
 				map[string]interface{}{
 					"counter": i,
 				},
-				allure.TestLabels{},
+				nil,
 				func() {
 
 				})
@@ -44,7 +44,7 @@ func TestAllureParametersExample(t *testing.T) {
 	allure.TestWithParameters(t,
 		"This is a test to show allure implementation with a passing test",
 		parameters,
-		allure.TestLabels{},
+		nil,
 		func() {
 			allure.Step(fmt.Sprintf("Number: %d", parameters["int"]), func() {})
 			allure.Step(fmt.Sprintf("String: %s", parameters["string"]), func() {})
@@ -81,14 +81,14 @@ func TestAllureParameterTypes(t *testing.T) {
 			"complex64":  complex(float32(2), float32(-2)),
 			"complex128": complex(float64(2), float64(-2)),
 		},
-		allure.TestLabels{},
+		nil,
 		func() {})
 }
 
 func TestAllureWithLabels(t *testing.T) {
 	allure.TestWithParameters(t, "Test with labels",
 		nil,
-		allure.TestLabels{
+		&allure.TestLabels{
 			Epic:     "Epic Epic of Epicness",
 			Lead:     "Duke Nukem",
 			Owner:    "Rex Powercolt",

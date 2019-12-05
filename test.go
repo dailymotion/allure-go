@@ -28,7 +28,7 @@ type TestLabels struct {
 }
 
 // TestWithParameters executes a test and adds parameters to the Allure result object
-func TestWithParameters(t *testing.T, description string, parameters map[string]interface{}, labels TestLabels, testFunc func()) {
+func TestWithParameters(t *testing.T, description string, parameters map[string]interface{}, labels *TestLabels, testFunc func()) {
 	var r *result
 	r = newResult()
 	r.UUID = generateUUID()
@@ -36,7 +36,9 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 	r.Name = t.Name()
 	r.FullName = strings.Join(camelcase.Split(t.Name()), " ")
 	r.Description = description
-	r.setLabels(t, labels)
+	if labels != nil {
+		r.setLabels(t, *labels)
+	}
 	r.Steps = make([]stepObject, 0)
 	if parameters == nil || len(parameters) > 0 {
 		r.Parameters = convertMapToParameters(parameters)
@@ -62,5 +64,5 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 
 //Test execute the test and creates an Allure result used by Allure reports
 func Test(t *testing.T, description string, testFunc func()) {
-	TestWithParameters(t, description, nil, TestLabels{}, testFunc)
+	TestWithParameters(t, description, nil, nil, testFunc)
 }
