@@ -60,6 +60,11 @@ type hasAttachments interface {
 	AddAttachment(attachment attachment)
 }
 
+type hasStatus interface {
+	SetStatus(status string)
+	GetStatus() string
+}
+
 func (r *result) GetAttachments() []attachment {
 	return r.Attachments
 }
@@ -74,6 +79,14 @@ func (r *result) GetSteps() []stepObject {
 
 func (r *result) AddStep(step stepObject) {
 	r.Steps = append(r.Steps, step)
+}
+
+func (r *result) SetStatus(status string) {
+	r.Status = status
+}
+
+func (r *result) GetStatus() string {
+	return r.Status
 }
 
 func (r *result) setLabels(t *testing.T, labels TestLabels) {
@@ -206,7 +219,7 @@ func copy(src, dst string) (int64, error) {
 	}
 	defer func() {
 		if err = source.Close(); err != nil {
-			log.Fatalf("Could not close the stream for the environment file, %f", err)
+			log.Printf("Could not close the stream for the environment file, %f\n", err)
 		}
 	}()
 
@@ -216,7 +229,7 @@ func copy(src, dst string) (int64, error) {
 	}
 	defer func() {
 		if err = destination.Close(); err != nil {
-			log.Fatalf("Could not close the stream for the destination of the environment file, %f", err)
+			log.Printf("Could not close the stream for the destination of the environment file, %f\n", err)
 		}
 	}()
 

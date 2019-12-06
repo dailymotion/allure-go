@@ -34,7 +34,7 @@ func AddAttachment(name string, mimeType MimeType, content []byte) error {
 func (a *attachment) writeAttachmentFile() error {
 	resultsPathEnv := os.Getenv(resultsPathEnvKey)
 	if resultsPathEnv == "" {
-		log.Fatalf("%s environment variable cannot be empty", resultsPathEnvKey)
+		log.Printf("%s environment variable cannot be empty\n", resultsPathEnvKey)
 	}
 
 	a.Source = fmt.Sprintf("%s-attachment", a.uuid)
