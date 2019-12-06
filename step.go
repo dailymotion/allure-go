@@ -1,6 +1,7 @@
 package allure
 
 import (
+	"log"
 	"testing"
 
 	"github.com/jtolds/gls"
