@@ -36,6 +36,9 @@ func (a *attachment) writeAttachmentFile() error {
 	if resultsPathEnv == "" {
 		log.Printf("%s environment variable cannot be empty\n", resultsPathEnvKey)
 	}
+	if resultsPath == "" {
+		resultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+	}
 
 	a.Source = fmt.Sprintf("%s-attachment", a.uuid)
 	err := ioutil.WriteFile(fmt.Sprintf("%s/%s-attachment", resultsPath, a.uuid), a.content, 0777)
