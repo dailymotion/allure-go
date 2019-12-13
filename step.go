@@ -35,6 +35,14 @@ func (s *stepObject) AddAttachment(attachment attachment) {
 	s.Attachments = append(s.Attachments, attachment)
 }
 
+func (s *stepObject) SetStatus(status string) {
+	s.Status = status
+}
+
+func (s *stepObject) GetStatus() string {
+	return s.Status
+}
+
 // Step is meant to be wrapped around actions
 func Step(description string, action func()) {
 	StepWithParameter(description, nil, action)
@@ -57,23 +65,26 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 
 	defer func() {
 		step.Stop = getTimestampMs()
-		if testInstance, ok := ctxMgr.GetValue(testInstanceKey); ok {
-			if testInstance.(*testing.T).Failed() {
-				step.Status = "failed"
-			}
-		}
-
-		if currentStepObj, ok := ctxMgr.GetValue(nodeKey); ok {
+		manipulateOnObjectFromCtx(
+			testInstanceKey,
+			func(testInstance interface{}) {
+				if testInstance.(*testing.T).Failed() {
+					if step.Status == "" {
+						step.Status = "failed"
+					}
+				}
+			})
+		manipulateOnObjectFromCtx(nodeKey, func(currentStepObj interface{}) {
 			currentStep := currentStepObj.(hasSteps)
 			currentStep.AddStep(*step)
-		} else {
-			log.Fatalln("could not retrieve current allure node")
-		}
+		})
 	}()
 
 	ctxMgr.SetValues(gls.Values{nodeKey: step}, action)
 	step.Stage = "finished"
-	step.Status = "passed"
+	if step.Status == "" {
+		step.Status = "passed"
+	}
 }
 
 // SkipStepWithParameter doesn't execute the action and marks the step as skipped in report
