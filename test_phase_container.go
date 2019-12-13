@@ -40,20 +40,36 @@ type subContainer struct {
 	Parameters    []Parameter    `json:"parameters,omitempty"`
 }
 
-func (sc *subContainer) GetAttachments() []attachment {
+func (sc *subContainer) getAttachments() []attachment {
 	return sc.Attachments
 }
 
-func (sc *subContainer) AddAttachment(attachment attachment) {
+func (sc *subContainer) addAttachment(attachment attachment) {
 	sc.Attachments = append(sc.Attachments, attachment)
 }
 
-func (sc *subContainer) GetSteps() []stepObject {
+func (sc *subContainer) getSteps() []stepObject {
 	return sc.Steps
 }
 
-func (sc *subContainer) AddStep(step stepObject) {
+func (sc *subContainer) addStep(step stepObject) {
 	sc.Steps = append(sc.Steps, step)
+}
+
+func (sc *subContainer) getStatusDetails() *statusDetails {
+	return sc.StatusDetails
+}
+
+func (sc *subContainer) setStatusDetails(details statusDetails) {
+	sc.StatusDetails = &details
+}
+
+func (sc *subContainer) setStatus(status string) {
+	sc.Status = status
+}
+
+func (sc *subContainer) getStatus() string {
+	return sc.Status
 }
 
 func getCurrentTestPhaseObject(t *testing.T) *testPhaseContainer {

@@ -33,45 +33,36 @@ type result struct {
 }
 type FailureMode string
 
-// This interface provides functions required to manipulate children step records, used in the result object and
-// step object for recursive handling
-type hasSteps interface {
-	GetSteps() []stepObject
-	AddStep(step stepObject)
-}
-
-type hasAttachments interface {
-	GetAttachments() []attachment
-	AddAttachment(attachment attachment)
-}
-
-type hasStatus interface {
-	SetStatus(status string)
-	GetStatus() string
-}
-
-func (r *result) GetAttachments() []attachment {
+func (r *result) getAttachments() []attachment {
 	return r.Attachments
 }
 
-func (r *result) AddAttachment(attachment attachment) {
+func (r *result) addAttachment(attachment attachment) {
 	r.Attachments = append(r.Attachments, attachment)
 }
 
-func (r *result) GetSteps() []stepObject {
+func (r *result) getSteps() []stepObject {
 	return r.Steps
 }
 
-func (r *result) AddStep(step stepObject) {
+func (r *result) addStep(step stepObject) {
 	r.Steps = append(r.Steps, step)
 }
 
-func (r *result) SetStatus(status string) {
+func (r *result) setStatus(status string) {
 	r.Status = status
 }
 
-func (r *result) GetStatus() string {
+func (r *result) getStatus() string {
 	return r.Status
+}
+
+func (r *result) getStatusDetails() *statusDetails {
+	return r.StatusDetails
+}
+
+func (r *result) setStatusDetails(details statusDetails) {
+	r.StatusDetails = &details
 }
 
 func (r *result) setLabels(t *testing.T, labels TestLabels) {

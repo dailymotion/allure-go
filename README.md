@@ -76,13 +76,13 @@ This project is still in progress. Here is the list of available features :
 
 Here is the list of improvements that are needed for existing features :
 - [X] Manage failure at step level : the project must be able to mark a Step as failed (red in the report) when an assertion fails. The assertion stacktrace must appear in the report.
-- [ ] Manage error at test and step level : the project must be able to mark a Test and Step as broken (orange in the report) when an error happens. The error stacktrace must appear in the report.
-- [ ] Add support of Links
+- [X] Manage error at test and step level : the project must be able to mark a Test and Step as broken (orange in the report) when an error happens. The error stacktrace must appear in the report.
+- [X] Add support of Links
 - [ ] Add support of Unknown status for Test object
-- [ ] Add support of Set up in Execution part of a Test
-- [ ] Add support of Tear down in Execution part of a Test
-- [ ] Add support of Severity
+- [X] Add support of Set up in Execution part of a Test
+- [X] Add support of Tear down in Execution part of a Test
+- [X] Add support of Severity
 - [ ] Add support of Flaky tag
-- [ ] Add support of Categories
-- [ ] Add support of Features
+- [X] Add support of Categories
+- [X] Add support of Features
 - [X] Add support for environment files

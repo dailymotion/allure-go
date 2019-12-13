@@ -27,7 +27,7 @@ func AfterTestWithParameters(t *testing.T, description string, parameters map[st
 		afterSubContainer.Stage = "finished"
 		testPhaseObject := getCurrentTestPhaseObject(t)
 		if testPhaseObject.Test.UUID == "" {
-			log.Printf("Test's \"%s\" allure teardwon is being executed before allure test!\n", t.Name())
+			log.Printf("Test's \"%s\" allure teardщwn is being executed before allure test!\n", t.Name())
 		}
 
 		after.Children = append(after.Children, testPhaseObject.Test.UUID)

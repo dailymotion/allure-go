@@ -19,27 +19,27 @@ type stepObject struct {
 	Stop          int64         `json:"stop"`
 }
 
-func (s *stepObject) GetSteps() []stepObject {
+func (s *stepObject) getSteps() []stepObject {
 	return s.ChildrenSteps
 }
 
-func (s *stepObject) AddStep(step stepObject) {
+func (s *stepObject) addStep(step stepObject) {
 	s.ChildrenSteps = append(s.ChildrenSteps, step)
 }
 
-func (s *stepObject) GetAttachments() []attachment {
+func (s *stepObject) getAttachments() []attachment {
 	return s.Attachments
 }
 
-func (s *stepObject) AddAttachment(attachment attachment) {
+func (s *stepObject) addAttachment(attachment attachment) {
 	s.Attachments = append(s.Attachments, attachment)
 }
 
-func (s *stepObject) SetStatus(status string) {
+func (s *stepObject) setStatus(status string) {
 	s.Status = status
 }
 
-func (s *stepObject) GetStatus() string {
+func (s *stepObject) getStatus() string {
 	return s.Status
 }
 
@@ -76,7 +76,7 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 			})
 		manipulateOnObjectFromCtx(nodeKey, func(currentStepObj interface{}) {
 			currentStep := currentStepObj.(hasSteps)
-			currentStep.AddStep(*step)
+			currentStep.addStep(*step)
 		})
 	}()
 
@@ -100,7 +100,7 @@ func SkipStepWithParameter(description, reason string, parameters map[string]int
 	step.StatusDetail.Message = reason
 	if currentStepObj, ok := ctxMgr.GetValue(nodeKey); ok {
 		currentStep := currentStepObj.(hasSteps)
-		currentStep.AddStep(*step)
+		currentStep.addStep(*step)
 	} else {
 		log.Fatalln("could not retrieve current allure node")
 	}

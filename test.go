@@ -61,11 +61,20 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 			}
 		}
 	}()
-	ctxMgr.SetValues(gls.Values{
-		testResultKey:   r,
-		nodeKey:         r,
-		testInstanceKey: t,
-	}, testFunc)
+	if !t.Failed() {
+		ctxMgr.SetValues(gls.Values{
+			testResultKey:   r,
+			nodeKey:         r,
+			testInstanceKey: t,
+		}, testFunc)
+	} else {
+		//ctxMgr.SetValues(gls.Values{
+		//	testResultKey:   r,
+		//	nodeKey:         r,
+		//	testInstanceKey: t,
+		//}, func() {})
+		r.Status = skipped
+	}
 }
 
 //Test execute the test and creates an Allure result used by Allure reports
