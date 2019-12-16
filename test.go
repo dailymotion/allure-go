@@ -1,10 +1,12 @@
 package allure
 
 import (
+	"fmt"
 	"github.com/dailymotion/allure-go/severity"
 	"github.com/fatih/camelcase"
 	"github.com/jtolds/gls"
 	"log"
+	"runtime/debug"
 	"strings"
 	"testing"
 )
@@ -41,7 +43,16 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 	}
 
 	defer func() {
+		panicObject := recover()
 		r.Stop = getTimestampMs()
+		if panicObject != nil {
+			t.Fail()
+			r.StatusDetails = &statusDetails{
+				Message: fmt.Sprintf("%+v", panicObject),
+				Trace:   filterStackTrace(debug.Stack()),
+			}
+			r.Status = broken
+		}
 		if r.Status == "" {
 			r.Status = getTestStatus(t)
 		}
@@ -50,6 +61,10 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 		err := r.writeResultsFile()
 		if err != nil {
 			log.Println("Failed to write content of result to json file", err)
+		}
+
+		if panicObject != nil {
+			panic(panicObject)
 		}
 	}()
 	ctxMgr.SetValues(gls.Values{
