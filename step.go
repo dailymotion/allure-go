@@ -1,6 +1,7 @@
 package allure
 
 import (
+	"github.com/pkg/errors"
 	"log"
 	"testing"
 
@@ -64,27 +65,36 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 	}
 
 	defer func() {
+		panicObject := recover()
 		step.Stop = getTimestampMs()
 		manipulateOnObjectFromCtx(
 			testInstanceKey,
 			func(testInstance interface{}) {
-				if testInstance.(*testing.T).Failed() {
+				if panicObject != nil {
+					Break(errors.Errorf("%+v", panicObject))
+				}
+				if testInstance.(*testing.T).Failed() ||
+					panicObject != nil {
 					if step.Status == "" {
 						step.Status = "failed"
 					}
 				}
 			})
+		step.Stage = "finished"
+		if step.Status == "" {
+			step.Status = "passed"
+		}
 		manipulateOnObjectFromCtx(nodeKey, func(currentStepObj interface{}) {
 			currentStep := currentStepObj.(hasSteps)
 			currentStep.addStep(*step)
 		})
+
+		if panicObject != nil {
+			panic(panicObject)
+		}
 	}()
 
 	ctxMgr.SetValues(gls.Values{nodeKey: step}, action)
-	step.Stage = "finished"
-	if step.Status == "" {
-		step.Status = "passed"
-	}
 }
 
 // SkipStepWithParameter doesn't execute the action and marks the step as skipped in report
