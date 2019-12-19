@@ -32,6 +32,7 @@ type result struct {
 	Befores       []Before       `json:"befores,omitempty"`
 	FullName      string         `json:"fullName,omitempty"`
 	Labels        []Label        `json:"labels,omitempty"`
+	test          func()
 }
 type FailureMode string
 
@@ -106,28 +107,38 @@ func (r *result) setLabels(t *testing.T, labels TestLabels) {
 	r.addLabel("package", testPackage)
 	r.addLabel("testClass", testPackage)
 	r.addLabel("testMethod", t.Name())
-	if labels.Owner != "" {
-		r.addLabel("owner", labels.Owner)
+	if hostname, err := os.Hostname(); err == nil {
+		r.addLabel("host", hostname)
 	}
-	if labels.Lead != "" {
-		r.addLabel("lead", labels.Lead)
-	}
-	if labels.Epic != "" {
-		r.addLabel("epic", labels.Epic)
-	}
-	if labels.Severity != "" {
-		r.addLabel("severity", string(labels.Severity))
-	}
-	if labels.Story != nil && len(labels.Story) > 0 {
-		for _, v := range labels.Story {
-			r.addLabel("story", v)
+
+	r.addLabel("language", "golang")
+
+	//TODO: these labels are available, but should be handled separately.
+
+	//	ParentSuite string
+	//	Suite       string
+	//	SubSuite    string
+	//	Thread      string
+	//	Framework   string
+}
+
+func (r *result) setDefaultLabels(t *testing.T) {
+	wsd := os.Getenv(wsPathEnvKey)
+
+	programCounters := make([]uintptr, 10)
+	callersCount := runtime.Callers(0, programCounters)
+	var testFile string
+	for i := 0; i < callersCount; i++ {
+		_, testFile, _, _ = runtime.Caller(i)
+		if strings.Contains(testFile, "_test.go") {
+			break
 		}
 	}
-	if labels.Feature != nil && len(labels.Feature) > 0 {
-		for _, v := range labels.Feature {
-			r.addLabel("feature", v)
-		}
-	}
+	testPackage := strings.TrimSuffix(strings.Replace(strings.TrimPrefix(testFile, wsd+"/"), "/", ".", -1), ".go")
+
+	r.addLabel("package", testPackage)
+	r.addLabel("testClass", testPackage)
+	r.addLabel("testMethod", t.Name())
 	if hostname, err := os.Hostname(); err == nil {
 		r.addLabel("host", hostname)
 	}

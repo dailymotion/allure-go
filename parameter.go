@@ -64,3 +64,52 @@ func convertMapToParameters(parameters map[string]interface{}) []Parameter {
 
 	return result
 }
+
+func parseParameter(name string, value interface{}) Parameter {
+	parameter := Parameter{
+		Name: name,
+	}
+
+	switch value.(type) {
+	case []byte:
+		parameter.Value = string(value.([]byte))
+	case uintptr:
+		parameter.Value = strconv.Itoa(int(value.(uintptr)))
+	case float32:
+		parameter.Value = strconv.FormatFloat(float64(value.(float32)), 'f', -1, 64)
+	case float64:
+		parameter.Value = strconv.FormatFloat(value.(float64), 'f', -1, 64)
+	case complex64:
+		parameter.Value = fmt.Sprintf("%f i%f", real(value.(complex64)), imag(value.(complex64)))
+	case complex128:
+		parameter.Value = fmt.Sprintf("%f i%f", real(value.(complex128)), imag(value.(complex128)))
+	case uint:
+		parameter.Value = strconv.FormatUint(uint64(value.(uint)), 10)
+	case uint8:
+		parameter.Value = strconv.FormatUint(uint64(value.(uint8)), 10)
+	case uint16:
+		parameter.Value = strconv.FormatUint(uint64(value.(uint16)), 10)
+	case uint32:
+		parameter.Value = strconv.FormatUint(uint64(value.(uint32)), 10)
+	case uint64:
+		parameter.Value = strconv.FormatUint(value.(uint64), 10)
+	case int:
+		parameter.Value = strconv.FormatInt(int64(value.(int)), 10)
+	case int8:
+		parameter.Value = strconv.FormatInt(int64(value.(int8)), 10)
+	case int16:
+		parameter.Value = strconv.FormatInt(int64(value.(int16)), 10)
+	case int32:
+		parameter.Value = strconv.FormatInt(int64(value.(int32)), 10)
+	case int64:
+		parameter.Value = strconv.FormatInt(value.(int64), 10)
+	case bool:
+		parameter.Value = strconv.FormatBool(value.(bool))
+	case string:
+		parameter.Value = value.(string)
+	default:
+		parameter.Value = fmt.Sprintf("%+value", value)
+	}
+
+	return parameter
+}

@@ -18,6 +18,7 @@ type stepObject struct {
 	Parameters    []Parameter   `json:"parameters"`
 	Start         int64         `json:"start"`
 	Stop          int64         `json:"stop"`
+	action        func()
 }
 
 func (s *stepObject) GetSteps() []stepObject {
@@ -115,6 +116,47 @@ func SkipStepWithParameter(description, reason string, parameters map[string]int
 		log.Fatalln("could not retrieve current allure node")
 	}
 	step.Stop = getTimestampMs()
+}
+
+func NewStep(description string, options ...StepOption) {
+	step := newStep()
+	step.Name = description
+	step.Start = getTimestampMs()
+	for _, option := range options {
+		option(step)
+	}
+
+	defer func() {
+		panicObject := recover()
+		step.Stop = getTimestampMs()
+		manipulateOnObjectFromCtx(
+			testInstanceKey,
+			func(testInstance interface{}) {
+				if panicObject != nil {
+					Break(errors.Errorf("%+v", panicObject))
+				}
+				if testInstance.(*testing.T).Failed() ||
+					panicObject != nil {
+					if step.Status == "" {
+						step.Status = "failed"
+					}
+				}
+			})
+		step.Stage = "finished"
+		if step.Status == "" {
+			step.Status = "passed"
+		}
+		manipulateOnObjectFromCtx(nodeKey, func(currentStepObj interface{}) {
+			currentStep := currentStepObj.(hasSteps)
+			currentStep.AddStep(*step)
+		})
+
+		if panicObject != nil {
+			panic(panicObject)
+		}
+	}()
+
+	ctxMgr.SetValues(gls.Values{nodeKey: step}, step.action)
 }
 
 func newStep() *stepObject {
