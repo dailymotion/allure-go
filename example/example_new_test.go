@@ -1,19 +1,21 @@
 package example
 
 import (
-	"fmt"
 	"github.com/dailymotion/allure-go"
-	"github.com/dailymotion/allure-go/severity"
+	"github.com/dailymotion/allure-go/step"
+	"github.com/dailymotion/allure-go/test"
 	"testing"
 )
 
 func TestNewTest(t *testing.T) {
-	allure.NewTest(t,
-		allure.Description("Test"),
-		allure.Severity(severity.Normal),
-		allure.Body(func() {
-			allure.NewStep("Stuff", allure.Action(func() {
-				fmt.Println("dfhdkjhdfkjlsf")
-			}))
+	allure.NewTest(
+		t,
+		test.Description("New Test Description"),
+		test.Body(func() {
+			allure.NewStep(
+				step.Description("Step description"),
+				step.Action(func() {
+
+				}))
 		}))
 }

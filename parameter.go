@@ -65,7 +65,7 @@ func convertMapToParameters(parameters map[string]interface{}) []Parameter {
 	return result
 }
 
-func parseParameter(name string, value interface{}) Parameter {
+func ParseParameter(name string, value interface{}) Parameter {
 	parameter := Parameter{
 		Name: name,
 	}

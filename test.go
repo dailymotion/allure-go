@@ -3,6 +3,7 @@ package allure
 import (
 	"fmt"
 	"github.com/dailymotion/allure-go/severity"
+	"github.com/dailymotion/allure-go/test"
 	"github.com/fatih/camelcase"
 	"github.com/jtolds/gls"
 	"log"
@@ -29,15 +30,15 @@ type TestLabels struct {
 
 // TestWithParameters executes a test and adds parameters to the Allure result object
 func TestWithParameters(t *testing.T, description string, parameters map[string]interface{}, labels TestLabels, testFunc func()) {
-	var r *result
+	var r *Result
 	r = newResult()
-	r.UUID = generateUUID()
+	r.UUID = GenerateUUID()
 	r.Start = getTimestampMs()
 	r.Name = t.Name()
 	r.FullName = strings.Join(camelcase.Split(t.Name()), " ")
 	r.Description = description
 	r.setLabels(t, labels)
-	r.Steps = make([]stepObject, 0)
+	r.Steps = make([]StepObject, 0)
 	if parameters == nil || len(parameters) > 0 {
 		r.Parameters = convertMapToParameters(parameters)
 	}
@@ -47,7 +48,7 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 		r.Stop = getTimestampMs()
 		if panicObject != nil {
 			t.Fail()
-			r.StatusDetails = &statusDetails{
+			r.StatusDetails = &StatusDetails{
 				Message: fmt.Sprintf("%+v", panicObject),
 				Trace:   filterStackTrace(debug.Stack()),
 			}
@@ -79,16 +80,16 @@ func Test(t *testing.T, description string, testFunc func()) {
 	TestWithParameters(t, description, nil, TestLabels{}, testFunc)
 }
 
-func NewTest(t *testing.T, options ...Option) {
-	var r *result
+func NewTest(t *testing.T, options ...test.Option) {
+	var r *Result
 	r = newResult()
-	r.UUID = generateUUID()
+	r.UUID = GenerateUUID()
 	r.Start = getTimestampMs()
 	r.Name = t.Name()
 	r.FullName = strings.Join(camelcase.Split(t.Name()), " ")
 	r.Description = t.Name()
 	r.setDefaultLabels(t)
-	r.Steps = make([]stepObject, 0)
+	r.Steps = make([]StepObject, 0)
 	for _, option := range options {
 		option(r)
 	}
@@ -98,7 +99,7 @@ func NewTest(t *testing.T, options ...Option) {
 		r.Stop = getTimestampMs()
 		if panicObject != nil {
 			t.Fail()
-			r.StatusDetails = &statusDetails{
+			r.StatusDetails = &StatusDetails{
 				Message: fmt.Sprintf("%+v", panicObject),
 				Trace:   filterStackTrace(debug.Stack()),
 			}
@@ -122,5 +123,5 @@ func NewTest(t *testing.T, options ...Option) {
 		testResultKey:   r,
 		nodeKey:         r,
 		testInstanceKey: t,
-	}, r.test)
+	}, r.Test)
 }

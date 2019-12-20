@@ -1,6 +1,7 @@
 package allure
 
 import (
+	"github.com/dailymotion/allure-go/step"
 	"github.com/pkg/errors"
 	"log"
 	"testing"
@@ -8,40 +9,40 @@ import (
 	"github.com/jtolds/gls"
 )
 
-type stepObject struct {
+type StepObject struct {
 	Name          string        `json:"name,omitempty"`
 	Status        string        `json:"status,omitempty"`
-	StatusDetail  statusDetails `json:"statusDetails,omitempty"`
+	StatusDetail  StatusDetails `json:"statusDetails,omitempty"`
 	Stage         string        `json:"stage"`
-	ChildrenSteps []stepObject  `json:"steps"`
-	Attachments   []attachment  `json:"attachments"`
+	ChildrenSteps []StepObject  `json:"steps"`
+	Attachments   []Attachment  `json:"attachments"`
 	Parameters    []Parameter   `json:"parameters"`
 	Start         int64         `json:"start"`
 	Stop          int64         `json:"stop"`
-	action        func()
+	Action        func()
 }
 
-func (s *stepObject) GetSteps() []stepObject {
+func (s *StepObject) GetSteps() []StepObject {
 	return s.ChildrenSteps
 }
 
-func (s *stepObject) AddStep(step stepObject) {
+func (s *StepObject) AddStep(step StepObject) {
 	s.ChildrenSteps = append(s.ChildrenSteps, step)
 }
 
-func (s *stepObject) GetAttachments() []attachment {
+func (s *StepObject) GetAttachments() []Attachment {
 	return s.Attachments
 }
 
-func (s *stepObject) AddAttachment(attachment attachment) {
+func (s *StepObject) AddAttachment(attachment Attachment) {
 	s.Attachments = append(s.Attachments, attachment)
 }
 
-func (s *stepObject) SetStatus(status string) {
+func (s *StepObject) SetStatus(status string) {
 	s.Status = status
 }
 
-func (s *stepObject) GetStatus() string {
+func (s *StepObject) GetStatus() string {
 	return s.Status
 }
 
@@ -58,16 +59,16 @@ func SkipStep(description, reason string, action func()) {
 
 // StepWithParameter is meant to be wrapped around actions with the purpose of logging the parameters
 func StepWithParameter(description string, parameters map[string]interface{}, action func()) {
-	step := newStep()
-	step.Name = description
-	step.Start = getTimestampMs()
+	stepObject := newStep()
+	stepObject.Name = description
+	stepObject.Start = getTimestampMs()
 	if parameters == nil || len(parameters) > 0 {
-		step.Parameters = convertMapToParameters(parameters)
+		stepObject.Parameters = convertMapToParameters(parameters)
 	}
 
 	defer func() {
 		panicObject := recover()
-		step.Stop = getTimestampMs()
+		stepObject.Stop = getTimestampMs()
 		manipulateOnObjectFromCtx(
 			testInstanceKey,
 			func(testInstance interface{}) {
@@ -76,18 +77,18 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 				}
 				if testInstance.(*testing.T).Failed() ||
 					panicObject != nil {
-					if step.Status == "" {
-						step.Status = "failed"
+					if stepObject.Status == "" {
+						stepObject.Status = "failed"
 					}
 				}
 			})
-		step.Stage = "finished"
-		if step.Status == "" {
-			step.Status = "passed"
+		stepObject.Stage = "finished"
+		if stepObject.Status == "" {
+			stepObject.Status = "passed"
 		}
 		manipulateOnObjectFromCtx(nodeKey, func(currentStepObj interface{}) {
 			currentStep := currentStepObj.(hasSteps)
-			currentStep.AddStep(*step)
+			currentStep.AddStep(*stepObject)
 		})
 
 		if panicObject != nil {
@@ -95,40 +96,39 @@ func StepWithParameter(description string, parameters map[string]interface{}, ac
 		}
 	}()
 
-	ctxMgr.SetValues(gls.Values{nodeKey: step}, action)
+	ctxMgr.SetValues(gls.Values{nodeKey: stepObject}, action)
 }
 
 // SkipStepWithParameter doesn't execute the action and marks the step as skipped in report
 // Reason won't appear in report until https://github.com/allure-framework/allure2/issues/774 is fixed
 func SkipStepWithParameter(description, reason string, parameters map[string]interface{}, action func()) {
-	step := newStep()
-	step.Start = getTimestampMs()
-	step.Name = description
+	stepObject := newStep()
+	stepObject.Start = getTimestampMs()
+	stepObject.Name = description
 	if parameters == nil || len(parameters) > 0 {
-		step.Parameters = convertMapToParameters(parameters)
+		stepObject.Parameters = convertMapToParameters(parameters)
 	}
-	step.Status = "skipped"
-	step.StatusDetail.Message = reason
+	stepObject.Status = "skipped"
+	stepObject.StatusDetail.Message = reason
 	if currentStepObj, ok := ctxMgr.GetValue(nodeKey); ok {
 		currentStep := currentStepObj.(hasSteps)
-		currentStep.AddStep(*step)
+		currentStep.AddStep(*stepObject)
 	} else {
 		log.Fatalln("could not retrieve current allure node")
 	}
-	step.Stop = getTimestampMs()
+	stepObject.Stop = getTimestampMs()
 }
 
-func NewStep(description string, options ...StepOption) {
-	step := newStep()
-	step.Name = description
-	step.Start = getTimestampMs()
+func NewStep(options ...step.Option) {
+	stepObject := newStep()
+	stepObject.Start = getTimestampMs()
 	for _, option := range options {
-		option(step)
+		option(stepObject)
 	}
 
 	defer func() {
 		panicObject := recover()
-		step.Stop = getTimestampMs()
+		stepObject.Stop = getTimestampMs()
 		manipulateOnObjectFromCtx(
 			testInstanceKey,
 			func(testInstance interface{}) {
@@ -137,18 +137,18 @@ func NewStep(description string, options ...StepOption) {
 				}
 				if testInstance.(*testing.T).Failed() ||
 					panicObject != nil {
-					if step.Status == "" {
-						step.Status = "failed"
+					if stepObject.Status == "" {
+						stepObject.Status = "failed"
 					}
 				}
 			})
-		step.Stage = "finished"
-		if step.Status == "" {
-			step.Status = "passed"
+		stepObject.Stage = "finished"
+		if stepObject.Status == "" {
+			stepObject.Status = "passed"
 		}
 		manipulateOnObjectFromCtx(nodeKey, func(currentStepObj interface{}) {
 			currentStep := currentStepObj.(hasSteps)
-			currentStep.AddStep(*step)
+			currentStep.AddStep(*stepObject)
 		})
 
 		if panicObject != nil {
@@ -156,13 +156,13 @@ func NewStep(description string, options ...StepOption) {
 		}
 	}()
 
-	ctxMgr.SetValues(gls.Values{nodeKey: step}, step.action)
+	ctxMgr.SetValues(gls.Values{nodeKey: stepObject}, stepObject.Action)
 }
 
-func newStep() *stepObject {
-	return &stepObject{
-		Attachments:   make([]attachment, 0),
-		ChildrenSteps: make([]stepObject, 0),
+func newStep() *StepObject {
+	return &StepObject{
+		Attachments:   make([]Attachment, 0),
+		ChildrenSteps: make([]StepObject, 0),
 		Parameters:    make([]Parameter, 0),
 	}
 }

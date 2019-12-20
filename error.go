@@ -35,14 +35,14 @@ func allureError(err error, status string, now bool) {
 	manipulateOnObjectFromCtx(
 		testResultKey,
 		func(testResult interface{}) {
-			testStatusDetails := testResult.(*result).StatusDetails
+			testStatusDetails := testResult.(*Result).StatusDetails
 			if testStatusDetails == nil {
-				testStatusDetails = &statusDetails{}
+				testStatusDetails = &StatusDetails{}
 			}
 			testStatusDetails.Trace = filterStackTrace(debug.Stack())
 			testStatusDetails.Message = err.Error()
-			testResult.(*result).StatusDetails = testStatusDetails
-			testResult.(*result).Status = status
+			testResult.(*Result).StatusDetails = testStatusDetails
+			testResult.(*Result).Status = status
 		})
 	manipulateOnObjectFromCtx(
 		nodeKey,

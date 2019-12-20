@@ -11,7 +11,7 @@ const (
 	skipped = "skipped"
 )
 
-type statusDetails struct {
+type StatusDetails struct {
 	Known   bool   `json:"known,omitempty"`
 	Muted   bool   `json:"muted,omitempty"`
 	Flaky   bool   `json:"flaky,omitempty"`

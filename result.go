@@ -16,15 +16,15 @@ import (
 )
 
 //result is the top level report object for a test
-type result struct {
+type Result struct {
 	UUID          string         `json:"uuid,omitempty"`
 	Name          string         `json:"name,omitempty"`
 	Description   string         `json:"description,omitempty"`
 	Status        string         `json:"status,omitempty"`
-	StatusDetails *statusDetails `json:"statusDetails,omitempty"`
+	StatusDetails *StatusDetails `json:"statusDetails,omitempty"`
 	Stage         string         `json:"stage,omitempty"`
-	Steps         []stepObject   `json:"steps,omitempty"`
-	Attachments   []attachment   `json:"attachments,omitempty"`
+	Steps         []StepObject   `json:"steps,omitempty"`
+	Attachments   []Attachment   `json:"attachments,omitempty"`
 	Parameters    []Parameter    `json:"parameters,omitempty"`
 	Start         int64          `json:"start,omitempty"`
 	Stop          int64          `json:"stop,omitempty"`
@@ -32,7 +32,7 @@ type result struct {
 	Befores       []Before       `json:"befores,omitempty"`
 	FullName      string         `json:"fullName,omitempty"`
 	Labels        []Label        `json:"labels,omitempty"`
-	test          func()
+	Test          func()
 }
 type FailureMode string
 
@@ -40,25 +40,25 @@ type FailureMode string
 type Before struct {
 	Name          string         `json:"name,omitempty"`
 	Status        string         `json:"status,omitempty"`
-	StatusDetails *statusDetails `json:"statusDetails,omitempty"`
+	StatusDetails *StatusDetails `json:"statusDetails,omitempty"`
 	Stage         string         `json:"stage,omitempty"`
 	Description   string         `json:"description,omitempty"`
 	Start         int64          `json:"start,omitempty"`
 	Stop          int64          `json:"stop,omitempty"`
-	Steps         []stepObject   `json:"steps,omitempty"`
-	Attachments   []attachment   `json:"attachments,omitempty"`
+	Steps         []StepObject   `json:"steps,omitempty"`
+	Attachments   []Attachment   `json:"attachments,omitempty"`
 }
 
 // This interface provides functions required to manipulate children step records, used in the result object and
 // step object for recursive handling
 type hasSteps interface {
-	GetSteps() []stepObject
-	AddStep(step stepObject)
+	GetSteps() []StepObject
+	AddStep(step StepObject)
 }
 
 type hasAttachments interface {
-	GetAttachments() []attachment
-	AddAttachment(attachment attachment)
+	GetAttachments() []Attachment
+	AddAttachment(attachment Attachment)
 }
 
 type hasStatus interface {
@@ -66,32 +66,32 @@ type hasStatus interface {
 	GetStatus() string
 }
 
-func (r *result) GetAttachments() []attachment {
+func (r *Result) GetAttachments() []Attachment {
 	return r.Attachments
 }
 
-func (r *result) AddAttachment(attachment attachment) {
+func (r *Result) AddAttachment(attachment Attachment) {
 	r.Attachments = append(r.Attachments, attachment)
 }
 
-func (r *result) GetSteps() []stepObject {
+func (r *Result) GetSteps() []StepObject {
 	return r.Steps
 }
 
-func (r *result) AddStep(step stepObject) {
+func (r *Result) AddStep(step StepObject) {
 	r.Steps = append(r.Steps, step)
 }
 
-func (r *result) SetStatus(status string) {
+func (r *Result) SetStatus(status string) {
 	r.Status = status
 }
 
-func (r *result) GetStatus() string {
+func (r *Result) GetStatus() string {
 	return r.Status
 }
 
-func (r *result) setLabels(t *testing.T, labels TestLabels) {
-	wsd := os.Getenv(wsPathEnvKey)
+func (r *Result) setLabels(t *testing.T, labels TestLabels) {
+	wsd := os.Getenv(WsPathEnvKey)
 
 	programCounters := make([]uintptr, 10)
 	callersCount := runtime.Callers(0, programCounters)
@@ -104,14 +104,14 @@ func (r *result) setLabels(t *testing.T, labels TestLabels) {
 	}
 	testPackage := strings.TrimSuffix(strings.Replace(strings.TrimPrefix(testFile, wsd+"/"), "/", ".", -1), ".go")
 
-	r.addLabel("package", testPackage)
-	r.addLabel("testClass", testPackage)
-	r.addLabel("testMethod", t.Name())
+	r.AddLabel("package", testPackage)
+	r.AddLabel("testClass", testPackage)
+	r.AddLabel("testMethod", t.Name())
 	if hostname, err := os.Hostname(); err == nil {
-		r.addLabel("host", hostname)
+		r.AddLabel("host", hostname)
 	}
 
-	r.addLabel("language", "golang")
+	r.AddLabel("language", "golang")
 
 	//TODO: these labels are available, but should be handled separately.
 
@@ -122,8 +122,8 @@ func (r *result) setLabels(t *testing.T, labels TestLabels) {
 	//	Framework   string
 }
 
-func (r *result) setDefaultLabels(t *testing.T) {
-	wsd := os.Getenv(wsPathEnvKey)
+func (r *Result) setDefaultLabels(t *testing.T) {
+	wsd := os.Getenv(WsPathEnvKey)
 
 	programCounters := make([]uintptr, 10)
 	callersCount := runtime.Callers(0, programCounters)
@@ -136,14 +136,14 @@ func (r *result) setDefaultLabels(t *testing.T) {
 	}
 	testPackage := strings.TrimSuffix(strings.Replace(strings.TrimPrefix(testFile, wsd+"/"), "/", ".", -1), ".go")
 
-	r.addLabel("package", testPackage)
-	r.addLabel("testClass", testPackage)
-	r.addLabel("testMethod", t.Name())
+	r.AddLabel("package", testPackage)
+	r.AddLabel("testClass", testPackage)
+	r.AddLabel("testMethod", t.Name())
 	if hostname, err := os.Hostname(); err == nil {
-		r.addLabel("host", hostname)
+		r.AddLabel("host", hostname)
 	}
 
-	r.addLabel("language", "golang")
+	r.AddLabel("language", "golang")
 
 	//TODO: these labels are available, but should be handled separately.
 
@@ -154,31 +154,31 @@ func (r *result) setDefaultLabels(t *testing.T) {
 	//	Framework   string
 }
 
-func (r *result) addLabel(name string, value string) {
+func (r *Result) AddLabel(name string, value string) {
 	r.Labels = append(r.Labels, Label{
 		Name:  name,
 		Value: value,
 	})
 }
 
-func (r *result) writeResultsFile() error {
-	createFolderOnce.Do(createFolderIfNotExists)
-	copyEnvFileOnce.Do(copyEnvFileIfExists)
+func (r *Result) writeResultsFile() error {
+	CreateFolderOnce.Do(createFolderIfNotExists)
+	CopyEnvFileOnce.Do(copyEnvFileIfExists)
 
 	j, err := json.Marshal(r)
 	if err != nil {
 		return errors.Wrap(err, "Failed to marshall result into JSON")
 	}
-	err = ioutil.WriteFile(fmt.Sprintf("%s/%s-result.json", resultsPath, r.UUID), j, 0777)
+	err = ioutil.WriteFile(fmt.Sprintf("%s/%s-result.json", ResultsPath, r.UUID), j, 0777)
 	if err != nil {
 		return errors.Wrap(err, "Failed to write in file")
 	}
 	return nil
 }
 
-func newResult() *result {
-	return &result{
-		UUID:  generateUUID(),
+func newResult() *Result {
+	return &Result{
+		UUID:  GenerateUUID(),
 		Start: getTimestampMs(),
 	}
 }
@@ -188,14 +188,14 @@ func getTimestampMs() int64 {
 }
 
 func createFolderIfNotExists() {
-	resultsPathEnv := os.Getenv(resultsPathEnvKey)
+	resultsPathEnv := os.Getenv(ResultsPathEnvKey)
 	if resultsPathEnv == "" {
-		log.Printf("environment variable %s cannot be empty\n", resultsPathEnvKey)
+		log.Printf("environment variable %s cannot be empty\n", ResultsPathEnvKey)
 	}
-	resultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+	ResultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
 
-	if _, err := os.Stat(resultsPath); os.IsNotExist(err) {
-		err = os.Mkdir(resultsPath, 0777)
+	if _, err := os.Stat(ResultsPath); os.IsNotExist(err) {
+		err = os.Mkdir(ResultsPath, 0777)
 		if err != nil {
 			log.Println(err, "Failed to create allure-results folder")
 		}
@@ -203,10 +203,10 @@ func createFolderIfNotExists() {
 }
 
 func copyEnvFileIfExists() {
-	if envFilePath := os.Getenv(envFileKey); envFilePath != "" {
+	if envFilePath := os.Getenv(EnvFileKey); envFilePath != "" {
 		envFilesStrings := strings.Split(envFilePath, "/")
-		if resultsPath != "" {
-			if _, err := copy(envFilePath, resultsPath+"/"+envFilesStrings[len(envFilesStrings)-1]); err != nil {
+		if ResultsPath != "" {
+			if _, err := copy(envFilePath, ResultsPath+"/"+envFilesStrings[len(envFilesStrings)-1]); err != nil {
 				log.Println("Could not copy the environment file", err)
 			}
 		}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func generateUUID() string {
+func GenerateUUID() string {
 	var entropy = make([]byte, 16)
 	rand.Read(entropy)
 	entropy[6] = (entropy[6] & 0x0f) | 0x40
