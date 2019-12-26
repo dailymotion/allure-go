@@ -1,6 +1,7 @@
 package allure
 
 import (
+	"github.com/dailymotion/allure-go/parameter"
 	"github.com/dailymotion/allure-go/step"
 	"github.com/pkg/errors"
 	"log"
@@ -10,15 +11,15 @@ import (
 )
 
 type StepObject struct {
-	Name          string        `json:"name,omitempty"`
-	Status        string        `json:"status,omitempty"`
-	StatusDetail  StatusDetails `json:"statusDetails,omitempty"`
-	Stage         string        `json:"stage"`
-	ChildrenSteps []StepObject  `json:"steps"`
-	Attachments   []Attachment  `json:"attachments"`
-	Parameters    []Parameter   `json:"parameters"`
-	Start         int64         `json:"start"`
-	Stop          int64         `json:"stop"`
+	Name          string                `json:"name,omitempty"`
+	Status        string                `json:"status,omitempty"`
+	StatusDetail  StatusDetails         `json:"statusDetails,omitempty"`
+	Stage         string                `json:"stage"`
+	ChildrenSteps []StepObject          `json:"steps"`
+	Attachments   []Attachment          `json:"attachments"`
+	Parameters    []parameter.Parameter `json:"parameters"`
+	Start         int64                 `json:"start"`
+	Stop          int64                 `json:"stop"`
 	Action        func()
 }
 
@@ -163,6 +164,6 @@ func newStep() *StepObject {
 	return &StepObject{
 		Attachments:   make([]Attachment, 0),
 		ChildrenSteps: make([]StepObject, 0),
-		Parameters:    make([]Parameter, 0),
+		Parameters:    make([]parameter.Parameter, 0),
 	}
 }

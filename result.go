@@ -3,6 +3,7 @@ package allure
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dailymotion/allure-go/parameter"
 	"io"
 	"io/ioutil"
 	"log"
@@ -17,21 +18,21 @@ import (
 
 //result is the top level report object for a test
 type Result struct {
-	UUID          string         `json:"uuid,omitempty"`
-	Name          string         `json:"name,omitempty"`
-	Description   string         `json:"description,omitempty"`
-	Status        string         `json:"status,omitempty"`
-	StatusDetails *StatusDetails `json:"statusDetails,omitempty"`
-	Stage         string         `json:"stage,omitempty"`
-	Steps         []StepObject   `json:"steps,omitempty"`
-	Attachments   []Attachment   `json:"attachments,omitempty"`
-	Parameters    []Parameter    `json:"parameters,omitempty"`
-	Start         int64          `json:"start,omitempty"`
-	Stop          int64          `json:"stop,omitempty"`
-	Children      []string       `json:"children,omitempty"`
-	Befores       []Before       `json:"befores,omitempty"`
-	FullName      string         `json:"fullName,omitempty"`
-	Labels        []Label        `json:"labels,omitempty"`
+	UUID          string                `json:"uuid,omitempty"`
+	Name          string                `json:"name,omitempty"`
+	Description   string                `json:"description,omitempty"`
+	Status        string                `json:"status,omitempty"`
+	StatusDetails *StatusDetails        `json:"statusDetails,omitempty"`
+	Stage         string                `json:"stage,omitempty"`
+	Steps         []StepObject          `json:"steps,omitempty"`
+	Attachments   []Attachment          `json:"attachments,omitempty"`
+	Parameters    []parameter.Parameter `json:"parameters,omitempty"`
+	Start         int64                 `json:"start,omitempty"`
+	Stop          int64                 `json:"stop,omitempty"`
+	Children      []string              `json:"children,omitempty"`
+	Befores       []Before              `json:"befores,omitempty"`
+	FullName      string                `json:"fullName,omitempty"`
+	Labels        []Label               `json:"labels,omitempty"`
 	Test          func()
 }
 type FailureMode string

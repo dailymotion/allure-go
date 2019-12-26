@@ -2,6 +2,7 @@ package allure
 
 import (
 	"fmt"
+	"github.com/dailymotion/allure-go/parameter"
 	"github.com/dailymotion/allure-go/severity"
 	"github.com/dailymotion/allure-go/test"
 	"github.com/fatih/camelcase"

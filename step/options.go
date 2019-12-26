@@ -1,24 +1,25 @@
 package step
 
-import "github.com/dailymotion/allure-go"
+import (
+	"github.com/dailymotion/allure-go/options"
+)
 
-type Option func(s *allure.StepObject)
+type Option func(s *options.HasOptions)
 
 func Parameter(name string, value interface{}) Option {
-	return func(s *allure.StepObject) {
-		parameter := allure.ParseParameter(name, value)
-		s.Parameters = append(s.Parameters, parameter)
+	return func(s *options.HasOptions) {
+		s.AddParameter(name, value)
 	}
 }
 
 func Action(action func()) Option {
-	return func(s *allure.StepObject) {
-		s.Action = action
+	return func(s *options.HasOptions) {
+		s.AddAction(action)
 	}
 }
 
 func Description(description string) Option {
-	return func(s *allure.StepObject) {
-		s.Name = description
+	return func(s *options.HasOptions) {
+		s.AddName(description)
 	}
 }
