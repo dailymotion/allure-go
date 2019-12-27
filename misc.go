@@ -3,7 +3,12 @@ package allure
 import (
 	"fmt"
 	"github.com/dailymotion/allure-go/parameter"
+	"io"
+	"log"
+	"os"
 	"strconv"
+	"strings"
+	"time"
 )
 
 func convertMapToParameters(parameters map[string]interface{}) []parameter.Parameter {
@@ -61,7 +66,7 @@ func convertMapToParameters(parameters map[string]interface{}) []parameter.Param
 	return result
 }
 
-func ParseParameter(name string, value interface{}) parameter.Parameter {
+func parseParameter(name string, value interface{}) parameter.Parameter {
 	result := parameter.Parameter{
 		Name: name,
 	}
@@ -108,4 +113,69 @@ func ParseParameter(name string, value interface{}) parameter.Parameter {
 	}
 
 	return result
+}
+
+func getTimestampMs() int64 {
+	return time.Now().UnixNano() / int64(time.Millisecond)
+}
+
+func createFolderIfNotExists() {
+	resultsPathEnv := os.Getenv(ResultsPathEnvKey)
+	if resultsPathEnv == "" {
+		log.Printf("environment variable %s cannot be empty\n", ResultsPathEnvKey)
+	}
+	ResultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+
+	if _, err := os.Stat(ResultsPath); os.IsNotExist(err) {
+		err = os.Mkdir(ResultsPath, 0777)
+		if err != nil {
+			log.Println(err, "Failed to create allure-results folder")
+		}
+	}
+}
+
+func copyEnvFileIfExists() {
+	if envFilePath := os.Getenv(EnvFileKey); envFilePath != "" {
+		envFilesStrings := strings.Split(envFilePath, "/")
+		if ResultsPath != "" {
+			if _, err := copy(envFilePath, ResultsPath+"/"+envFilesStrings[len(envFilesStrings)-1]); err != nil {
+				log.Println("Could not copy the environment file", err)
+			}
+		}
+
+	}
+}
+
+func copy(src, dst string) (int64, error) {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		return 0, err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return 0, err
+	}
+	defer func() {
+		if err = source.Close(); err != nil {
+			log.Printf("Could not close the stream for the environment file, %f\n", err)
+		}
+	}()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return 0, err
+	}
+	defer func() {
+		if err = destination.Close(); err != nil {
+			log.Printf("Could not close the stream for the destination of the environment file, %f\n", err)
+		}
+	}()
+
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
 }

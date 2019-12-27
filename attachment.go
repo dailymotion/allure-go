@@ -50,7 +50,7 @@ func (a *Attachment) writeAttachmentFile() error {
 
 func newAttachment(name string, mimeType MimeType, content []byte) *Attachment {
 	result := &Attachment{
-		uuid:    GenerateUUID(),
+		uuid:    generateUUID(),
 		content: content,
 		Name:    name,
 		Type:    mimeType,

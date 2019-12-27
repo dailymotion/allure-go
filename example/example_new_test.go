@@ -8,11 +8,11 @@ import (
 )
 
 func TestNewTest(t *testing.T) {
-	allure.NewTest(
+	allure.Test(
 		t,
 		test.Description("New Test Description"),
 		test.Body(func() {
-			allure.NewStep(
+			allure.Step(
 				step.Description("Step description"),
 				step.Action(func() {
 
