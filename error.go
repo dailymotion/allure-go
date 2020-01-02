@@ -1,7 +1,6 @@
 package allure
 
 import (
-	"fmt"
 	"runtime/debug"
 	"strings"
 	"testing"
@@ -48,7 +47,6 @@ func allureError(err error, status string, now bool) {
 		nodeKey,
 		func(node interface{}) {
 			node.(hasStatus).SetStatus(status)
-			fmt.Printf("Set %+v status to %s\n", node, status)
 		})
 	manipulateOnObjectFromCtx(
 		testInstanceKey,
