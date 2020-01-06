@@ -18,7 +18,7 @@ type Result struct {
 	Name          string                `json:"name,omitempty"`
 	Description   string                `json:"description,omitempty"`
 	Status        string                `json:"status,omitempty"`
-	StatusDetails *StatusDetails        `json:"statusDetails,omitempty"`
+	StatusDetails *statusDetails        `json:"statusDetails,omitempty"`
 	Stage         string                `json:"stage,omitempty"`
 	Steps         []StepObject          `json:"steps,omitempty"`
 	Attachments   []Attachment          `json:"attachments,omitempty"`
@@ -31,53 +31,53 @@ type Result struct {
 	Test          func()                `json:"-"`
 }
 
-func (r *Result) AddReason(reason string) {
+func (r *Result) addReason(reason string) {
 	testStatusDetails := r.StatusDetails
 	if testStatusDetails == nil {
-		testStatusDetails = &StatusDetails{}
+		testStatusDetails = &statusDetails{}
 	}
 	r.StatusDetails.Message = reason
 }
 
-func (r *Result) AddDescription(description string) {
+func (r *Result) addDescription(description string) {
 	r.Description = description
 }
 
-func (r *Result) AddParameter(name string, value interface{}) {
+func (r *Result) addParameter(name string, value interface{}) {
 	r.Parameters = append(r.Parameters, parseParameter(name, value))
 }
 
-func (r *Result) AddName(name string) {
+func (r *Result) addName(name string) {
 	r.Name = name
 }
 
-func (r *Result) AddAction(action func()) {
+func (r *Result) addAction(action func()) {
 	r.Test = action
 }
 
 type FailureMode string
 
-func (r *Result) GetAttachments() []Attachment {
+func (r *Result) getAttachments() []Attachment {
 	return r.Attachments
 }
 
-func (r *Result) AddAttachment(attachment Attachment) {
+func (r *Result) addAttachment(attachment Attachment) {
 	r.Attachments = append(r.Attachments, attachment)
 }
 
-func (r *Result) GetSteps() []StepObject {
+func (r *Result) getSteps() []StepObject {
 	return r.Steps
 }
 
-func (r *Result) AddStep(step StepObject) {
+func (r *Result) addStep(step StepObject) {
 	r.Steps = append(r.Steps, step)
 }
 
-func (r *Result) SetStatus(status string) {
+func (r *Result) setStatus(status string) {
 	r.Status = status
 }
 
-func (r *Result) GetStatus() string {
+func (r *Result) getStatus() string {
 	return r.Status
 }
 
@@ -95,14 +95,14 @@ func (r *Result) setDefaultLabels(t *testing.T) {
 	}
 	testPackage := strings.TrimSuffix(strings.Replace(strings.TrimPrefix(testFile, wsd+"/"), "/", ".", -1), ".go")
 
-	r.AddLabel("package", testPackage)
-	r.AddLabel("testClass", testPackage)
-	r.AddLabel("testMethod", t.Name())
+	r.addLabel("package", testPackage)
+	r.addLabel("testClass", testPackage)
+	r.addLabel("testMethod", t.Name())
 	if hostname, err := os.Hostname(); err == nil {
-		r.AddLabel("host", hostname)
+		r.addLabel("host", hostname)
 	}
 
-	r.AddLabel("language", "golang")
+	r.addLabel("language", "golang")
 
 	//TODO: these labels are available, but should be handled separately.
 
@@ -113,7 +113,7 @@ func (r *Result) setDefaultLabels(t *testing.T) {
 	//	Framework   string
 }
 
-func (r *Result) AddLabel(name string, value string) {
+func (r *Result) addLabel(name string, value string) {
 	r.Labels = append(r.Labels, Label{
 		Name:  name,
 		Value: value,

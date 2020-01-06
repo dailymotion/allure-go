@@ -1,7 +1,6 @@
 package allure
 
 import (
-	"fmt"
 	"runtime/debug"
 	"strings"
 	"testing"
@@ -37,7 +36,7 @@ func allureError(err error, status string, now bool) {
 		func(testResult interface{}) {
 			testStatusDetails := testResult.(*Result).StatusDetails
 			if testStatusDetails == nil {
-				testStatusDetails = &StatusDetails{}
+				testStatusDetails = &statusDetails{}
 			}
 			testStatusDetails.Trace = filterStackTrace(debug.Stack())
 			testStatusDetails.Message = err.Error()
@@ -47,8 +46,7 @@ func allureError(err error, status string, now bool) {
 	manipulateOnObjectFromCtx(
 		nodeKey,
 		func(node interface{}) {
-			node.(hasStatus).SetStatus(status)
-			fmt.Printf("Set %+v status to %s\n", node, status)
+			node.(hasStatus).setStatus(status)
 		})
 	manipulateOnObjectFromCtx(
 		testInstanceKey,

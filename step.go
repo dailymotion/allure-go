@@ -2,7 +2,6 @@ package allure
 
 import (
 	"github.com/dailymotion/allure-go/parameter"
-	"github.com/dailymotion/allure-go/step"
 	"github.com/pkg/errors"
 	"log"
 	"testing"
@@ -13,7 +12,7 @@ import (
 type StepObject struct {
 	Name          string                `json:"name,omitempty"`
 	Status        string                `json:"status,omitempty"`
-	StatusDetails *StatusDetails        `json:"statusDetails,omitempty"`
+	StatusDetails *statusDetails        `json:"statusDetails,omitempty"`
 	Stage         string                `json:"stage"`
 	ChildrenSteps []StepObject          `json:"steps"`
 	Attachments   []Attachment          `json:"attachments"`
@@ -23,78 +22,79 @@ type StepObject struct {
 	Action        func()                `json:"-"`
 }
 
-func (s *StepObject) AddReason(reason string) {
+func (s *StepObject) addReason(reason string) {
 	testStatusDetails := s.StatusDetails
 	if testStatusDetails == nil {
-		testStatusDetails = &StatusDetails{}
+		s.StatusDetails = &statusDetails{}
 	}
 	s.StatusDetails.Message = reason
 }
 
-func (s *StepObject) AddLabel(key string, value string) {
+func (s *StepObject) addLabel(key string, value string) {
 	// Step doesn't have labels
 }
 
-func (s *StepObject) AddDescription(description string) {
-	// Step doesn't have description
+func (s *StepObject) addDescription(description string) {
+	s.Name = description
 }
 
-func (s *StepObject) AddParameter(name string, value interface{}) {
+func (s *StepObject) addParameter(name string, value interface{}) {
 	s.Parameters = append(s.Parameters, parseParameter(name, value))
 }
 
-func (s *StepObject) AddName(name string) {
+func (s *StepObject) addName(name string) {
 	s.Name = name
 }
 
-func (s *StepObject) AddAction(action func()) {
+func (s *StepObject) addAction(action func()) {
 	s.Action = action
 }
 
-func (s *StepObject) GetSteps() []StepObject {
+func (s *StepObject) getSteps() []StepObject {
 	return s.ChildrenSteps
 }
 
-func (s *StepObject) AddStep(step StepObject) {
+func (s *StepObject) addStep(step StepObject) {
 	s.ChildrenSteps = append(s.ChildrenSteps, step)
 }
 
-func (s *StepObject) GetAttachments() []Attachment {
+func (s *StepObject) getAttachments() []Attachment {
 	return s.Attachments
 }
 
-func (s *StepObject) AddAttachment(attachment Attachment) {
+func (s *StepObject) addAttachment(attachment Attachment) {
 	s.Attachments = append(s.Attachments, attachment)
 }
 
-func (s *StepObject) SetStatus(status string) {
+func (s *StepObject) setStatus(status string) {
 	s.Status = status
 }
 
-func (s *StepObject) GetStatus() string {
+func (s *StepObject) getStatus() string {
 	return s.Status
 }
 
 // SkipStep doesn't execute the action and marks the step as skipped in report
 // Reason won't appear in report until https://github.com/allure-framework/allure2/issues/774 is fixed
-func SkipStep(stepOptions ...step.Option) {
+func SkipStep(stepOptions ...Option) {
 	stepObject := newStep()
 	stepObject.Start = getTimestampMs()
 	for _, option := range stepOptions {
 		option(stepObject)
 	}
 	stepObject.Status = "skipped"
+	stepObject.Stage = "finished"
+	stepObject.Stop = getTimestampMs()
 	if currentStepObj, ok := ctxMgr.GetValue(nodeKey); ok {
 		currentStep := currentStepObj.(hasSteps)
-		currentStep.AddStep(*stepObject)
+		currentStep.addStep(*stepObject)
 	} else {
 		log.Fatalln("could not retrieve current allure node")
 	}
-	stepObject.Stop = getTimestampMs()
 }
 
 // Step is meant to be wrapped around actions
-func Step(stepOptions ...step.Option) {
+func Step(stepOptions ...Option) {
 	stepObject := newStep()
 	stepObject.Start = getTimestampMs()
 	for _, option := range stepOptions {
@@ -123,7 +123,7 @@ func Step(stepOptions ...step.Option) {
 		}
 		manipulateOnObjectFromCtx(nodeKey, func(currentStepObj interface{}) {
 			currentStep := currentStepObj.(hasSteps)
-			currentStep.AddStep(*stepObject)
+			currentStep.addStep(*stepObject)
 		})
 
 		if panicObject != nil {

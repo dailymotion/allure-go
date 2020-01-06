@@ -3,7 +3,6 @@ package allure
 import (
 	"fmt"
 	"github.com/dailymotion/allure-go/severity"
-	"github.com/dailymotion/allure-go/test"
 	"github.com/fatih/camelcase"
 	"github.com/jtolds/gls"
 	"log"
@@ -29,7 +28,7 @@ type TestLabels struct {
 }
 
 //Test execute the test and creates an Allure result used by Allure reports
-func Test(t *testing.T, testOptions ...test.Option) {
+func Test(t *testing.T, testOptions ...Option) {
 	var r *Result
 	r = newResult()
 	r.UUID = generateUUID()
@@ -48,7 +47,7 @@ func Test(t *testing.T, testOptions ...test.Option) {
 		r.Stop = getTimestampMs()
 		if panicObject != nil {
 			t.Fail()
-			r.StatusDetails = &StatusDetails{
+			r.StatusDetails = &statusDetails{
 				Message: fmt.Sprintf("%+v", panicObject),
 				Trace:   filterStackTrace(debug.Stack()),
 			}
@@ -62,10 +61,6 @@ func Test(t *testing.T, testOptions ...test.Option) {
 		err := r.writeResultsFile()
 		if err != nil {
 			log.Println("Failed to write content of result to json file", err)
-		}
-
-		if panicObject != nil {
-			panic(panicObject)
 		}
 	}()
 	ctxMgr.SetValues(gls.Values{

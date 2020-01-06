@@ -2,24 +2,22 @@ package example
 
 import (
 	"github.com/dailymotion/allure-go"
-	"github.com/dailymotion/allure-go/step"
-	"github.com/dailymotion/allure-go/test"
 	"io/ioutil"
 	"log"
 	"testing"
 )
 
 func TestTextAttachmentToStep(t *testing.T) {
-	allure.Test(t, test.Description("Testing a text attachment"), test.Body(func() {
-		allure.Step(step.Description("adding a text attachment"), step.Action(func() {
+	allure.Test(t, allure.Description("Testing a text attachment"), allure.Body(func() {
+		allure.Step(allure.Description("adding a text attachment"), allure.Body(func() {
 			_ = allure.AddAttachment("text!", allure.TextPlain, []byte("Some text!"))
 		}))
 	}))
 }
 
 func TestImageAttachmentToStep(t *testing.T) {
-	allure.Test(t, test.Description("testing an image attachment"), test.Body(func() {
-		allure.Step(step.Description("adding an image attachment"), step.Action(func() {
+	allure.Test(t, allure.Description("testing an image attachment"), allure.Body(func() {
+		allure.Step(allure.Description("adding an image attachment"), allure.Body(func() {
 			dat, err := ioutil.ReadFile("../Coryphaena_hippurus.png")
 			if err != nil {
 				log.Println(err)
@@ -30,13 +28,13 @@ func TestImageAttachmentToStep(t *testing.T) {
 }
 
 func TestTextAttachment(t *testing.T) {
-	allure.Test(t, test.Description("Testing a text attachment"), test.Body(func() {
+	allure.Test(t, allure.Description("Testing a text attachment"), allure.Body(func() {
 		_ = allure.AddAttachment("text!", allure.TextPlain, []byte("Some text!"))
 	}))
 }
 
 func TestImageAttachment(t *testing.T) {
-	allure.Test(t, test.Description("testing an image attachment"), test.Body(func() {
+	allure.Test(t, allure.Description("testing an image attachment"), allure.Body(func() {
 		dat, err := ioutil.ReadFile("../Coryphaena_hippurus.png")
 		if err != nil {
 			log.Println(err)

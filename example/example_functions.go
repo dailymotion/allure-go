@@ -2,26 +2,25 @@ package example
 
 import (
 	"github.com/dailymotion/allure-go"
-	"github.com/dailymotion/allure-go/step"
 )
 
 func doSomething() {
-	allure.Step(step.Description("Something"), step.Action(func() {
+	allure.Step(allure.Description("Something"), allure.Body(func() {
 		doSomethingNested()
 	}))
 }
 
 func doSomethingNested() {
-	allure.Step(step.Description("Because we can!"), step.Action(func() {}))
+	allure.Step(allure.Description("Because we can!"), allure.Body(func() {}))
 }
 
 func addSomeParameters(parameters map[string]interface{}) {
-	var stepOptions = make([]step.Option, 0)
+	var stepOptions = make([]allure.Option, 0)
 	for k, v := range parameters {
-		stepOptions = append(stepOptions, step.Parameter(k, v))
+		stepOptions = append(stepOptions, allure.Parameter(k, v))
 	}
-	stepOptions = append(stepOptions, step.Description("Step with parameters"))
-	stepOptions = append(stepOptions, step.Action(func() {}))
+	stepOptions = append(stepOptions, allure.Description("Step with parameters"))
+	stepOptions = append(stepOptions, allure.Body(func() {}))
 
 	allure.Step(stepOptions...)
 }
