@@ -1,6 +1,6 @@
-package parameter
+package allure
 
-type Parameter struct {
+type parameter struct {
 	Name  string `json:"name,omitempty"`
 	Value string `json:"value,omitempty"`
 }

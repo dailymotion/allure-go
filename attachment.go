@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-type Attachment struct {
+type attachment struct {
 	uuid    string
 	Name    string   `json:"name"`
 	Source  string   `json:"source"`
@@ -31,7 +31,7 @@ func AddAttachment(name string, mimeType MimeType, content []byte) error {
 	return nil
 }
 
-func (a *Attachment) writeAttachmentFile() error {
+func (a *attachment) writeAttachmentFile() error {
 	resultsPathEnv := os.Getenv(ResultsPathEnvKey)
 	if resultsPathEnv == "" {
 		log.Printf("%s environment variable cannot be empty\n", ResultsPathEnvKey)
@@ -48,8 +48,8 @@ func (a *Attachment) writeAttachmentFile() error {
 	return nil
 }
 
-func newAttachment(name string, mimeType MimeType, content []byte) *Attachment {
-	result := &Attachment{
+func newAttachment(name string, mimeType MimeType, content []byte) *attachment {
+	result := &attachment{
 		uuid:    generateUUID(),
 		content: content,
 		Name:    name,

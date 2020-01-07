@@ -12,8 +12,8 @@ type hasOptions interface {
 // This interface provides functions required to manipulate children step records, used in the result object and
 // step object for recursive handling
 type hasSteps interface {
-	getSteps() []StepObject
-	addStep(step StepObject)
+	getSteps() []stepObject
+	addStep(step stepObject)
 }
 
 type hasStatus interface {
@@ -22,6 +22,6 @@ type hasStatus interface {
 }
 
 type hasAttachments interface {
-	getAttachments() []Attachment
-	addAttachment(attachment Attachment)
+	getAttachments() []attachment
+	addAttachment(attachment attachment)
 }

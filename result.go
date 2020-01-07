@@ -3,7 +3,6 @@ package allure
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dailymotion/allure-go/parameter"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"
@@ -13,25 +12,25 @@ import (
 )
 
 //result is the top level report object for a test
-type Result struct {
-	UUID          string                `json:"uuid,omitempty"`
-	Name          string                `json:"name,omitempty"`
-	Description   string                `json:"description,omitempty"`
-	Status        string                `json:"status,omitempty"`
-	StatusDetails *statusDetails        `json:"statusDetails,omitempty"`
-	Stage         string                `json:"stage,omitempty"`
-	Steps         []StepObject          `json:"steps,omitempty"`
-	Attachments   []Attachment          `json:"attachments,omitempty"`
-	Parameters    []parameter.Parameter `json:"parameters,omitempty"`
-	Start         int64                 `json:"start,omitempty"`
-	Stop          int64                 `json:"stop,omitempty"`
-	Children      []string              `json:"children,omitempty"`
-	FullName      string                `json:"fullName,omitempty"`
-	Labels        []Label               `json:"labels,omitempty"`
-	Test          func()                `json:"-"`
+type result struct {
+	UUID          string         `json:"uuid,omitempty"`
+	Name          string         `json:"name,omitempty"`
+	Description   string         `json:"description,omitempty"`
+	Status        string         `json:"status,omitempty"`
+	StatusDetails *statusDetails `json:"statusDetails,omitempty"`
+	Stage         string         `json:"stage,omitempty"`
+	Steps         []stepObject   `json:"steps,omitempty"`
+	Attachments   []attachment   `json:"attachments,omitempty"`
+	Parameters    []parameter    `json:"parameters,omitempty"`
+	Start         int64          `json:"start,omitempty"`
+	Stop          int64          `json:"stop,omitempty"`
+	Children      []string       `json:"children,omitempty"`
+	FullName      string         `json:"fullName,omitempty"`
+	Labels        []label        `json:"labels,omitempty"`
+	Test          func()         `json:"-"`
 }
 
-func (r *Result) addReason(reason string) {
+func (r *result) addReason(reason string) {
 	testStatusDetails := r.StatusDetails
 	if testStatusDetails == nil {
 		testStatusDetails = &statusDetails{}
@@ -39,49 +38,49 @@ func (r *Result) addReason(reason string) {
 	r.StatusDetails.Message = reason
 }
 
-func (r *Result) addDescription(description string) {
+func (r *result) addDescription(description string) {
 	r.Description = description
 }
 
-func (r *Result) addParameter(name string, value interface{}) {
+func (r *result) addParameter(name string, value interface{}) {
 	r.Parameters = append(r.Parameters, parseParameter(name, value))
 }
 
-func (r *Result) addName(name string) {
+func (r *result) addName(name string) {
 	r.Name = name
 }
 
-func (r *Result) addAction(action func()) {
+func (r *result) addAction(action func()) {
 	r.Test = action
 }
 
 type FailureMode string
 
-func (r *Result) getAttachments() []Attachment {
+func (r *result) getAttachments() []attachment {
 	return r.Attachments
 }
 
-func (r *Result) addAttachment(attachment Attachment) {
+func (r *result) addAttachment(attachment attachment) {
 	r.Attachments = append(r.Attachments, attachment)
 }
 
-func (r *Result) getSteps() []StepObject {
+func (r *result) getSteps() []stepObject {
 	return r.Steps
 }
 
-func (r *Result) addStep(step StepObject) {
+func (r *result) addStep(step stepObject) {
 	r.Steps = append(r.Steps, step)
 }
 
-func (r *Result) setStatus(status string) {
+func (r *result) setStatus(status string) {
 	r.Status = status
 }
 
-func (r *Result) getStatus() string {
+func (r *result) getStatus() string {
 	return r.Status
 }
 
-func (r *Result) setDefaultLabels(t *testing.T) {
+func (r *result) setDefaultLabels(t *testing.T) {
 	wsd := os.Getenv(WsPathEnvKey)
 
 	programCounters := make([]uintptr, 10)
@@ -113,14 +112,14 @@ func (r *Result) setDefaultLabels(t *testing.T) {
 	//	Framework   string
 }
 
-func (r *Result) addLabel(name string, value string) {
-	r.Labels = append(r.Labels, Label{
+func (r *result) addLabel(name string, value string) {
+	r.Labels = append(r.Labels, label{
 		Name:  name,
 		Value: value,
 	})
 }
 
-func (r *Result) writeResultsFile() error {
+func (r *result) writeResultsFile() error {
 	CreateFolderOnce.Do(createFolderIfNotExists)
 	CopyEnvFileOnce.Do(copyEnvFileIfExists)
 
@@ -135,8 +134,8 @@ func (r *Result) writeResultsFile() error {
 	return nil
 }
 
-func newResult() *Result {
-	return &Result{
+func newResult() *result {
+	return &result{
 		UUID:  generateUUID(),
 		Start: getTimestampMs(),
 	}

@@ -1,7 +1,6 @@
 package allure
 
 import (
-	"github.com/dailymotion/allure-go/parameter"
 	"github.com/pkg/errors"
 	"log"
 	"testing"
@@ -9,20 +8,20 @@ import (
 	"github.com/jtolds/gls"
 )
 
-type StepObject struct {
-	Name          string                `json:"name,omitempty"`
-	Status        string                `json:"status,omitempty"`
-	StatusDetails *statusDetails        `json:"statusDetails,omitempty"`
-	Stage         string                `json:"stage"`
-	ChildrenSteps []StepObject          `json:"steps"`
-	Attachments   []Attachment          `json:"attachments"`
-	Parameters    []parameter.Parameter `json:"parameters"`
-	Start         int64                 `json:"start"`
-	Stop          int64                 `json:"stop"`
-	Action        func()                `json:"-"`
+type stepObject struct {
+	Name          string         `json:"name,omitempty"`
+	Status        string         `json:"status,omitempty"`
+	StatusDetails *statusDetails `json:"statusDetails,omitempty"`
+	Stage         string         `json:"stage"`
+	ChildrenSteps []stepObject   `json:"steps"`
+	Attachments   []attachment   `json:"attachments"`
+	Parameters    []parameter    `json:"parameters"`
+	Start         int64          `json:"start"`
+	Stop          int64          `json:"stop"`
+	Action        func()         `json:"-"`
 }
 
-func (s *StepObject) addReason(reason string) {
+func (s *stepObject) addReason(reason string) {
 	testStatusDetails := s.StatusDetails
 	if testStatusDetails == nil {
 		s.StatusDetails = &statusDetails{}
@@ -30,47 +29,47 @@ func (s *StepObject) addReason(reason string) {
 	s.StatusDetails.Message = reason
 }
 
-func (s *StepObject) addLabel(key string, value string) {
+func (s *stepObject) addLabel(key string, value string) {
 	// Step doesn't have labels
 }
 
-func (s *StepObject) addDescription(description string) {
+func (s *stepObject) addDescription(description string) {
 	s.Name = description
 }
 
-func (s *StepObject) addParameter(name string, value interface{}) {
+func (s *stepObject) addParameter(name string, value interface{}) {
 	s.Parameters = append(s.Parameters, parseParameter(name, value))
 }
 
-func (s *StepObject) addName(name string) {
+func (s *stepObject) addName(name string) {
 	s.Name = name
 }
 
-func (s *StepObject) addAction(action func()) {
+func (s *stepObject) addAction(action func()) {
 	s.Action = action
 }
 
-func (s *StepObject) getSteps() []StepObject {
+func (s *stepObject) getSteps() []stepObject {
 	return s.ChildrenSteps
 }
 
-func (s *StepObject) addStep(step StepObject) {
+func (s *stepObject) addStep(step stepObject) {
 	s.ChildrenSteps = append(s.ChildrenSteps, step)
 }
 
-func (s *StepObject) getAttachments() []Attachment {
+func (s *stepObject) getAttachments() []attachment {
 	return s.Attachments
 }
 
-func (s *StepObject) addAttachment(attachment Attachment) {
+func (s *stepObject) addAttachment(attachment attachment) {
 	s.Attachments = append(s.Attachments, attachment)
 }
 
-func (s *StepObject) setStatus(status string) {
+func (s *stepObject) setStatus(status string) {
 	s.Status = status
 }
 
-func (s *StepObject) getStatus() string {
+func (s *stepObject) getStatus() string {
 	return s.Status
 }
 
@@ -134,10 +133,10 @@ func Step(stepOptions ...Option) {
 	ctxMgr.SetValues(gls.Values{nodeKey: stepObject}, stepObject.Action)
 }
 
-func newStep() *StepObject {
-	return &StepObject{
-		Attachments:   make([]Attachment, 0),
-		ChildrenSteps: make([]StepObject, 0),
-		Parameters:    make([]parameter.Parameter, 0),
+func newStep() *stepObject {
+	return &stepObject{
+		Attachments:   make([]attachment, 0),
+		ChildrenSteps: make([]stepObject, 0),
+		Parameters:    make([]parameter, 0),
 	}
 }

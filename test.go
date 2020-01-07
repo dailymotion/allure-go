@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-type TestLabels struct {
+type testLabels struct {
 	Epic        string
 	Lead        string
 	Owner       string
@@ -29,7 +29,7 @@ type TestLabels struct {
 
 //Test execute the test and creates an Allure result used by Allure reports
 func Test(t *testing.T, testOptions ...Option) {
-	var r *Result
+	var r *result
 	r = newResult()
 	r.UUID = generateUUID()
 	r.Start = getTimestampMs()
@@ -37,7 +37,7 @@ func Test(t *testing.T, testOptions ...Option) {
 	r.FullName = strings.Join(camelcase.Split(t.Name()), " ")
 	r.Description = t.Name()
 	r.setDefaultLabels(t)
-	r.Steps = make([]StepObject, 0)
+	r.Steps = make([]stepObject, 0)
 	for _, option := range testOptions {
 		option(r)
 	}
