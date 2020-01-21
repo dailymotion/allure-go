@@ -48,13 +48,19 @@ func Parameter(name string, value interface{}) Option {
 	}
 }
 
+func Parameters(parameters map[string]interface{}) Option {
+	return func(r hasOptions) {
+		r.addParameters(parameters)
+	}
+}
+
 func Description(description string) Option {
 	return func(r hasOptions) {
 		r.addDescription(description)
 	}
 }
 
-func Body(action func()) Option {
+func Action(action func()) Option {
 	return func(r hasOptions) {
 		r.addAction(action)
 	}

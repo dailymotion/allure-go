@@ -41,6 +41,12 @@ func (s *stepObject) addParameter(name string, value interface{}) {
 	s.Parameters = append(s.Parameters, parseParameter(name, value))
 }
 
+func (s *stepObject) addParameters(parameters map[string]interface{}) {
+	for key, value := range parameters {
+		s.Parameters = append(s.Parameters, parseParameter(key, value))
+	}
+}
+
 func (s *stepObject) addName(name string) {
 	s.Name = name
 }

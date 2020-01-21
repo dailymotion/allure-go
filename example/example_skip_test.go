@@ -8,7 +8,7 @@ import (
 func TestSkip(t *testing.T) {
 	allure.Test(t,
 		allure.Description("Skip test"),
-		allure.Body(func() {
-			allure.SkipStep(allure.Description("Skip"), allure.Body(func() {}), allure.Reason("reason"))
+		allure.Action(func() {
+			allure.SkipStep(allure.Description("Skip"), allure.Action(func() {}), allure.Reason("reason"))
 		}))
 }

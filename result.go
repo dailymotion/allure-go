@@ -46,6 +46,12 @@ func (r *result) addParameter(name string, value interface{}) {
 	r.Parameters = append(r.Parameters, parseParameter(name, value))
 }
 
+func (r *result) addParameters(parameters map[string]interface{}) {
+	for key, value := range parameters {
+		r.Parameters = append(r.Parameters, parseParameter(key, value))
+	}
+}
+
 func (r *result) addName(name string) {
 	r.Name = name
 }

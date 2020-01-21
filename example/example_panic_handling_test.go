@@ -7,7 +7,7 @@ import (
 
 func TestPanicBasic(t *testing.T) {
 	allure.Test(t, allure.Description("Panic handling test"),
-		allure.Body(func() {
+		allure.Action(func() {
 			panic("throwing a panic")
 		}))
 }

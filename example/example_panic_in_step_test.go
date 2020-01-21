@@ -8,10 +8,10 @@ import (
 func TestPanicInStep(t *testing.T) {
 	allure.Test(t,
 		allure.Description("Panic handling test"),
-		allure.Body(func() {
+		allure.Action(func() {
 			allure.Step(
 				allure.Description("step that will panic"),
-				allure.Body(func() {
+				allure.Action(func() {
 					panic("throwing a panic")
 				}))
 		}))

@@ -30,32 +30,33 @@ func TestAllureParameterized(t *testing.T) {
 			allure.Test(t,
 				allure.Description("Test with parameters"),
 				allure.Parameter("counter", i),
-				allure.Body(func() {}))
+				allure.Action(func() {}))
 		})
 	}
 }
 
 func TestAllureParametersExample(t *testing.T) {
 	allure.Test(t,
+		allure.Parameters(parameters),
 		allure.Description("This is a test to show allure implementation with a passing test"),
-		allure.Body(func() {
-			allure.Step(allure.Description(fmt.Sprintf("Number: %d", parameters["int"])), allure.Body(func() {}))
-			allure.Step(allure.Description(fmt.Sprintf("String: %s", parameters["string"])), allure.Body(func() {}))
-			allure.Step(allure.Description(fmt.Sprintf("Interface: %+v", parameters["struct"])), allure.Body(func() {}))
+		allure.Action(func() {
+			allure.Step(allure.Description(fmt.Sprintf("Number: %d", parameters["int"])), allure.Action(func() {}))
+			allure.Step(allure.Description(fmt.Sprintf("String: %s", parameters["string"])), allure.Action(func() {}))
+			allure.Step(allure.Description(fmt.Sprintf("Interface: %+v", parameters["struct"])), allure.Action(func() {}))
 		}))
 }
 
 func TestAllureStepWithParameters(t *testing.T) {
 	allure.Test(t,
 		allure.Description("Test with steps that have parameters"),
-		allure.Body(func() {
+		allure.Action(func() {
 			for i := 0; i < 5; i++ {
 				allure.Step(
 					allure.Description("Step with parameters"),
 					allure.Parameter("counter", i),
-					allure.Body(func() {}))
+					allure.Action(func() {}))
 			}
-			allure.SkipStep(allure.Description("Step with parameters"), allure.Reason("Skip this step with parameters"), allure.Parameter("counter", 5), allure.Body(func() {}))
+			allure.SkipStep(allure.Description("Step with parameters"), allure.Reason("Skip this step with parameters"), allure.Parameter("counter", 5), allure.Action(func() {}))
 		}))
 }
 
@@ -77,7 +78,7 @@ func TestAllureParameterTypes(t *testing.T) {
 		allure.Parameter("float64", float64(10.5)),
 		allure.Parameter("complex64", complex(float32(2), float32(-2))),
 		allure.Parameter("complex128", complex(float64(2), float64(-2))),
-		allure.Body(func() {}))
+		allure.Action(func() {}))
 }
 
 func TestAllureWithLabels(t *testing.T) {
@@ -90,5 +91,5 @@ func TestAllureWithLabels(t *testing.T) {
 		allure.Story("story2"),
 		allure.Feature("feature1"),
 		allure.Feature("feature2"),
-		allure.Body(func() {}))
+		allure.Action(func() {}))
 }

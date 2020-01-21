@@ -4,6 +4,7 @@ type hasOptions interface {
 	addLabel(key string, value string)
 	addDescription(description string)
 	addParameter(name string, value interface{})
+	addParameters(parameters map[string]interface{})
 	addName(name string)
 	addAction(action func())
 	addReason(reason string)
