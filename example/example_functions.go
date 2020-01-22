@@ -1,17 +1,15 @@
 package example
 
-import "github.com/dailymotion/allure-go"
+import (
+	"github.com/dailymotion/allure-go"
+)
 
 func doSomething() {
-	allure.Step("Something", func() {
+	allure.Step(allure.Description("Something"), allure.Action(func() {
 		doSomethingNested()
-	})
+	}))
 }
 
 func doSomethingNested() {
-	allure.Step("Because we can!", func() {})
-}
-
-func addSomeParameters(parameters map[string]interface{}) {
-	allure.StepWithParameter("Step with parameters", parameters, func() {})
+	allure.Step(allure.Description("Because we can!"), allure.Action(func() {}))
 }

@@ -6,9 +6,13 @@ import (
 )
 
 func TestPanicInStep(t *testing.T) {
-	allure.Test(t, "Panic handling test", func() {
-		allure.Step("step that will panic", func() {
-			panic("throwing a panic")
-		})
-	})
+	allure.Test(t,
+		allure.Description("Panic handling test"),
+		allure.Action(func() {
+			allure.Step(
+				allure.Description("step that will panic"),
+				allure.Action(func() {
+					panic("throwing a panic")
+				}))
+		}))
 }

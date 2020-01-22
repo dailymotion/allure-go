@@ -27,75 +27,69 @@ var parameters = map[string]interface{}{
 func TestAllureParameterized(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		t.Run("", func(t *testing.T) {
-			allure.TestWithParameters(t,
-				"Test with parameters",
-				map[string]interface{}{
-					"counter": i,
-				},
-				allure.TestLabels{},
-				func() {
-
-				})
+			allure.Test(t,
+				allure.Description("Test with parameters"),
+				allure.Parameter("counter", i),
+				allure.Action(func() {}))
 		})
 	}
 }
 
 func TestAllureParametersExample(t *testing.T) {
-	allure.TestWithParameters(t,
-		"This is a test to show allure implementation with a passing test",
-		parameters,
-		allure.TestLabels{},
-		func() {
-			allure.Step(fmt.Sprintf("Number: %d", parameters["int"]), func() {})
-			allure.Step(fmt.Sprintf("String: %s", parameters["string"]), func() {})
-			allure.Step(fmt.Sprintf("Interface: %+v", parameters["struct"]), func() {})
-		})
+	allure.Test(t,
+		allure.Parameters(parameters),
+		allure.Description("This is a test to show allure implementation with a passing test"),
+		allure.Action(func() {
+			allure.Step(allure.Description(fmt.Sprintf("Number: %d", parameters["int"])), allure.Action(func() {}))
+			allure.Step(allure.Description(fmt.Sprintf("String: %s", parameters["string"])), allure.Action(func() {}))
+			allure.Step(allure.Description(fmt.Sprintf("Interface: %+v", parameters["struct"])), allure.Action(func() {}))
+		}))
 }
 
 func TestAllureStepWithParameters(t *testing.T) {
-	allure.Test(t, "Test with steps that have parameters", func() {
-		for i := 0; i < 5; i++ {
-			allure.StepWithParameter("Step with parameters", map[string]interface{}{"counter": i}, func() {})
-		}
-		allure.SkipStepWithParameter("Step with parameters", "Skip this step with parameters", map[string]interface{}{"counter": 6}, func() {})
-	})
+	allure.Test(t,
+		allure.Description("Test with steps that have parameters"),
+		allure.Action(func() {
+			for i := 0; i < 5; i++ {
+				allure.Step(
+					allure.Description("Step with parameters"),
+					allure.Parameter("counter", i),
+					allure.Action(func() {}))
+			}
+			allure.SkipStep(allure.Description("Step with parameters"), allure.Reason("Skip this step with parameters"), allure.Parameter("counter", 5), allure.Action(func() {}))
+		}))
 }
 
 func TestAllureParameterTypes(t *testing.T) {
-	allure.TestWithParameters(t,
-		"Test parameter types",
-		map[string]interface{}{
-			"uintptr":    uintptr(10),
-			"uint":       uint(10),
-			"uint8":      uint8(10),
-			"uint16":     uint16(10),
-			"uint32":     uint32(10),
-			"uint64":     uint64(10),
-			"int":        int(10),
-			"int8":       int8(10),
-			"int16":      int16(10),
-			"int32":      int32(10),
-			"int64":      int64(10),
-			"float32":    float32(10.5),
-			"float64":    float64(10.5),
-			"complex64":  complex(float32(2), float32(-2)),
-			"complex128": complex(float64(2), float64(-2)),
-		},
-		allure.TestLabels{},
-		func() {})
+	allure.Test(t,
+		allure.Description("Test parameter types"),
+		allure.Parameter("uintptr", uintptr(10)),
+		allure.Parameter("uint", uint(10)),
+		allure.Parameter("uint8", uint8(10)),
+		allure.Parameter("uint16", uint16(10)),
+		allure.Parameter("uint32", uint32(10)),
+		allure.Parameter("uint64", uint64(10)),
+		allure.Parameter("int", int(10)),
+		allure.Parameter("int8", int8(10)),
+		allure.Parameter("int16", int16(10)),
+		allure.Parameter("int32", int32(10)),
+		allure.Parameter("int64", int64(10)),
+		allure.Parameter("float32", float32(10.5)),
+		allure.Parameter("float64", float64(10.5)),
+		allure.Parameter("complex64", complex(float32(2), float32(-2))),
+		allure.Parameter("complex128", complex(float64(2), float64(-2))),
+		allure.Action(func() {}))
 }
 
 func TestAllureWithLabels(t *testing.T) {
-	allure.TestWithParameters(t, "Test with labels",
-		nil,
-		allure.TestLabels{
-			Epic:     "Epic Epic of Epicness",
-			Lead:     "Duke Nukem",
-			Owner:    "Rex Powercolt",
-			Severity: severity.Critical,
-			Story:    []string{"story1", "story2"},
-			Feature:  []string{"feature1", "feature2"},
-		}, func() {
-
-		})
+	allure.Test(t, allure.Description("Test with labels"),
+		allure.Epic("Epic Epic of Epicness"),
+		allure.Lead("Duke Nukem"),
+		allure.Owner("Rex Powercolt"),
+		allure.Severity(severity.Critical),
+		allure.Story("story1"),
+		allure.Story("story2"),
+		allure.Feature("feature1"),
+		allure.Feature("feature2"),
+		allure.Action(func() {}))
 }

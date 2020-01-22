@@ -46,7 +46,7 @@ func allureError(err error, status string, now bool) {
 	manipulateOnObjectFromCtx(
 		nodeKey,
 		func(node interface{}) {
-			node.(hasStatus).SetStatus(status)
+			node.(hasStatus).setStatus(status)
 		})
 	manipulateOnObjectFromCtx(
 		testInstanceKey,

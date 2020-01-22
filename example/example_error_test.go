@@ -7,35 +7,34 @@ import (
 )
 
 func TestFailAllure(t *testing.T) {
-	allure.Test(t, "Test with Allure error in it", func() {
-		allure.Step("Step 1", func() {
-		})
-		allure.Step("Step 2", func() {
+	allure.Test(t, allure.Description("Test with Allure error in it"), allure.Action(func() {
+		allure.Step(allure.Description("Step 1"), allure.Action(func() {
+		}))
+		allure.Step(allure.Description("Step 2"), allure.Action(func() {
 			allure.Fail(errors.New("Error message"))
-		})
-	})
+		}))
+	}))
 }
 
 func TestFailNowAllure(t *testing.T) {
-	allure.Test(t, "Test with Allure error in it", func() {
+	allure.Test(t, allure.Description("Test with Allure error in it"), allure.Action(func() {
 		allure.FailNow(errors.New("A more serious error"))
-		allure.Step("Step you're not supposed to see", func() {})
-	})
+		allure.Step(allure.Description("Step you're not supposed to see"), allure.Action(func() {}))
+	}))
 }
 
 func TestBreakAllure(t *testing.T) {
-	allure.Test(t, "Test with Allure error in it", func() {
-		allure.Step("Step 1", func() {
-		})
-		allure.Step("Step 2", func() {
+	allure.Test(t, allure.Description("Test with Allure error in it"), allure.Action(func() {
+		allure.Step(allure.Description("Step 1"), allure.Action(func() {}))
+		allure.Step(allure.Description("Step 2"), allure.Action(func() {
 			allure.Break(errors.New("Error message"))
-		})
-	})
+		}))
+	}))
 }
 
 func TestBreakNowAllure(t *testing.T) {
-	allure.Test(t, "Test with Allure error in it", func() {
+	allure.Test(t, allure.Description("Test with Allure error in it"), allure.Action(func() {
 		allure.BreakNow(errors.New("A more serious error"))
-		allure.Step("Step you're not supposed to see", func() {})
-	})
+		allure.Step(allure.Description("Step you're not supposed to see"), allure.Action(func() {}))
+	}))
 }

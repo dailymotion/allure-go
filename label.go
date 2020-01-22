@@ -1,6 +1,6 @@
 package allure
 
-type Label struct {
+type label struct {
 	Name  string `json:"name,omitempty"`
 	Value string `json:"value,omitempty"`
 }
