@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-type TestLabels struct {
+type testLabels struct {
 	Epic        string
 	Lead        string
 	Owner       string
@@ -27,19 +27,19 @@ type TestLabels struct {
 	Language    string
 }
 
-// TestWithParameters executes a test and adds parameters to the Allure result object
-func TestWithParameters(t *testing.T, description string, parameters map[string]interface{}, labels TestLabels, testFunc func()) {
+//Test execute the test and creates an Allure result used by Allure reports
+func Test(t *testing.T, testOptions ...Option) {
 	var r *result
 	r = newResult()
 	r.UUID = generateUUID()
 	r.Start = getTimestampMs()
 	r.Name = t.Name()
 	r.FullName = strings.Join(camelcase.Split(t.Name()), " ")
-	r.Description = description
-	r.setLabels(t, labels)
+	r.Description = t.Name()
+	r.setDefaultLabels(t)
 	r.Steps = make([]stepObject, 0)
-	if parameters == nil || len(parameters) > 0 {
-		r.Parameters = convertMapToParameters(parameters)
+	for _, option := range testOptions {
+		option(r)
 	}
 
 	defer func() {
@@ -62,19 +62,10 @@ func TestWithParameters(t *testing.T, description string, parameters map[string]
 		if err != nil {
 			log.Println("Failed to write content of result to json file", err)
 		}
-
-		if panicObject != nil {
-			panic(panicObject)
-		}
 	}()
 	ctxMgr.SetValues(gls.Values{
 		testResultKey:   r,
 		nodeKey:         r,
 		testInstanceKey: t,
-	}, testFunc)
-}
-
-//Test execute the test and creates an Allure result used by Allure reports
-func Test(t *testing.T, description string, testFunc func()) {
-	TestWithParameters(t, description, nil, TestLabels{}, testFunc)
+	}, r.Test)
 }

@@ -25,23 +25,23 @@ func AddAttachment(name string, mimeType MimeType, content []byte) error {
 		return errors.Wrap(err, "Failed to create an attachment file")
 	}
 	if node, ok := ctxMgr.GetValue(nodeKey); ok {
-		node.(hasAttachments).AddAttachment(*attachment)
+		node.(hasAttachments).addAttachment(*attachment)
 	}
 
 	return nil
 }
 
 func (a *attachment) writeAttachmentFile() error {
-	resultsPathEnv := os.Getenv(resultsPathEnvKey)
+	resultsPathEnv := os.Getenv(ResultsPathEnvKey)
 	if resultsPathEnv == "" {
-		log.Printf("%s environment variable cannot be empty\n", resultsPathEnvKey)
+		log.Printf("%s environment variable cannot be empty\n", ResultsPathEnvKey)
 	}
-	if resultsPath == "" {
-		resultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+	if ResultsPath == "" {
+		ResultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
 	}
 
 	a.Source = fmt.Sprintf("%s-attachment", a.uuid)
-	err := ioutil.WriteFile(fmt.Sprintf("%s/%s-attachment", resultsPath, a.uuid), a.content, 0777)
+	err := ioutil.WriteFile(fmt.Sprintf("%s/%s-attachment", ResultsPath, a.uuid), a.content, 0777)
 	if err != nil {
 		return errors.Wrap(err, "Failed to write in file")
 	}
