@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-// BeforeTestWithParameters executes a setup phase of the test and adds parameters to the Allure container object
-func BeforeTestWithParameters(t *testing.T, description string, parameters map[string]interface{}, labels TestLabels, testFunc func()) {
+// BeforeTest executes a setup phase of the test and adds parameters to the Allure container object
+func BeforeTest(t *testing.T, testOptions ...Option) {
 	testPhaseObject := getCurrentTestPhaseObject(t)
 	if testPhaseObject.Test != nil {
 		log.Printf("Test's \"%s\" allure setup is being executed after allure test!\n", t.Name())
@@ -18,13 +18,9 @@ func BeforeTestWithParameters(t *testing.T, description string, parameters map[s
 
 	before.UUID = generateUUID()
 	beforeSubContainer.Start = getTimestampMs()
-	before.Name = t.Name()
-
-	before.Description = description
-
 	beforeSubContainer.Steps = make([]stepObject, 0)
-	if parameters == nil || len(parameters) > 0 {
-		beforeSubContainer.Parameters = convertMapToParameters(parameters)
+	for _, option := range testOptions {
+		option(beforeSubContainer)
 	}
 
 	defer func() {
@@ -37,12 +33,7 @@ func BeforeTestWithParameters(t *testing.T, description string, parameters map[s
 		testResultKey:   beforeSubContainer,
 		nodeKey:         beforeSubContainer,
 		testInstanceKey: t,
-	}, testFunc)
-}
-
-//BeforeTest executes the setup phase of the test and creates an Allure container object used by Allure reports
-func BeforeTest(t *testing.T, description string, testFunc func()) {
-	BeforeTestWithParameters(t, description, nil, TestLabels{}, testFunc)
+	}, beforeSubContainer.Action)
 }
 
 func newBefore() *container {

@@ -37,7 +37,42 @@ type subContainer struct {
 	Stop          int64          `json:"stop,omitempty"`
 	Steps         []stepObject   `json:"steps,omitempty"`
 	Attachments   []attachment   `json:"attachments,omitempty"`
-	Parameters    []Parameter    `json:"parameters,omitempty"`
+	Parameters    []parameter    `json:"parameters,omitempty"`
+	Action        func()         `json:"-"`
+}
+
+func (sc *subContainer) addLabel(key string, value string) {
+	panic("implement me")
+}
+
+func (sc *subContainer) addDescription(description string) {
+	sc.Description = description
+}
+
+func (sc *subContainer) addParameter(name string, value interface{}) {
+	sc.Parameters = append(sc.Parameters, parseParameter(name, value))
+}
+
+func (sc *subContainer) addParameters(parameters map[string]interface{}) {
+	for key, value := range parameters {
+		sc.Parameters = append(sc.Parameters, parseParameter(key, value))
+	}
+}
+
+func (sc *subContainer) addName(name string) {
+	sc.Name = name
+}
+
+func (sc *subContainer) addAction(action func()) {
+	sc.Action = action
+}
+
+func (sc *subContainer) addReason(reason string) {
+	testStatusDetails := sc.StatusDetails
+	if testStatusDetails == nil {
+		testStatusDetails = &statusDetails{}
+	}
+	sc.StatusDetails.Message = reason
 }
 
 func (sc *subContainer) getAttachments() []attachment {
@@ -87,14 +122,6 @@ func getCurrentTestPhaseObject(t *testing.T) *testPhaseContainer {
 	return currentPhaseObject
 }
 
-//func getCurrentTestUUID(t *testing.T) string {
-//	if currentTest := getCurrentTestPhaseObject(t).Test; currentTest != nil {
-//		return currentTest.UUID
-//	} else {
-//		return ""
-//	}
-//}
-
 func (c container) writeResultsFile() error {
 	createFolderOnce.Do(createFolderIfNotExists)
 	copyEnvFileOnce.Do(copyEnvFileIfExists)
@@ -114,6 +141,6 @@ func newHelper() *subContainer {
 	return &subContainer{
 		Steps:       make([]stepObject, 0),
 		Attachments: make([]attachment, 0),
-		Parameters:  make([]Parameter, 0),
+		Parameters:  make([]parameter, 0),
 	}
 }

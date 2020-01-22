@@ -6,19 +6,16 @@ import (
 	"testing"
 )
 
-// AfterTestWithParameters executes a teardown phase of the test and adds parameters to the Allure container object
-func AfterTestWithParameters(t *testing.T, description string, parameters map[string]interface{}, labels TestLabels, testFunc func()) {
+// AfterTest executes a teardown phase of the test and adds parameters to the Allure container object
+func AfterTest(t *testing.T, testOptions ...Option) {
 	after := newAfter()
 	afterSubContainer := after.Afters[0]
 	after.UUID = generateUUID()
 	afterSubContainer.Start = getTimestampMs()
-	after.Name = t.Name()
-
-	after.Description = description
 
 	afterSubContainer.Steps = make([]stepObject, 0)
-	if parameters == nil || len(parameters) > 0 {
-		afterSubContainer.Parameters = convertMapToParameters(parameters)
+	for _, option := range testOptions {
+		option(afterSubContainer)
 	}
 
 	defer func() {
@@ -42,12 +39,7 @@ func AfterTestWithParameters(t *testing.T, description string, parameters map[st
 		testResultKey:   afterSubContainer,
 		nodeKey:         afterSubContainer,
 		testInstanceKey: t,
-	}, testFunc)
-}
-
-//AfterTest executes the teardown phase of the test and creates an Allure container object used by Allure reports
-func AfterTest(t *testing.T, description string, testFunc func()) {
-	AfterTestWithParameters(t, description, nil, TestLabels{}, testFunc)
+	}, afterSubContainer.Action)
 }
 
 func newAfter() *container {

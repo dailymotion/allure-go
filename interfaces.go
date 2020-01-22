@@ -26,3 +26,8 @@ type hasAttachments interface {
 	getAttachments() []attachment
 	addAttachment(attachment attachment)
 }
+
+type hasStatusDetails interface {
+	getStatusDetails() *statusDetails
+	setStatusDetails(details statusDetails)
+}

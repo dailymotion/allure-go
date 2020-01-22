@@ -7,23 +7,39 @@ import (
 )
 
 func TestAllureSetupTeardown(t *testing.T) {
-	allure.BeforeTest(t, "setup", func() {
-		allure.Step("Setup step 1", func() {})
-	})
+	allure.BeforeTest(t,
+		allure.Description("setup"),
+		allure.Action(func() {
+			allure.Step(
+				allure.Description("Setup step 1"),
+				allure.Action(func() {}))
+		}))
 
-	allure.Test(t, "actual test", func() {
-		allure.Step("Test step 1", func() {})
-	})
+	allure.Test(t,
+		allure.Description("actual test"),
+		allure.Action(func() {
+			allure.Step(
+				allure.Description("Test step 1"),
+				allure.Action(func() {}))
+		}))
 
-	allure.AfterTest(t, "teardown", func() {
-		allure.Step("teardown step 1", func() {})
-	})
+	allure.AfterTest(t,
+		allure.Description("teardown"),
+		allure.Action(func() {
+			allure.Step(
+				allure.Description("teardown step 1"),
+				allure.Action(func() {}))
+		}))
 }
 
 func TestAllureSetupFailed(t *testing.T) {
-	allure.BeforeTest(t, "setup failed", func() {
-		allure.Fail(errors.New("some error"))
-	})
+	allure.BeforeTest(t,
+		allure.Description("setup failed"),
+		allure.Action(func() {
+			allure.Fail(errors.New("some error"))
+		}))
 
-	allure.Test(t, "actual test", func() {})
+	allure.Test(t,
+		allure.Description("actual test"),
+		allure.Action(func() {}))
 }
