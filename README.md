@@ -2,7 +2,18 @@
 
 allure-go is a Go package that provides support for Allure reports in Golang : https://github.com/allure-framework/allure2
 
-## Installing
+## Table of Contents
+
+1. [Installation](#installation)
+2. [Usage](#usage)
+    1. [Specifying allure-results folder location](#specifying-allure-results-folder-location)
+    2. [Using environment file](#using-environment-file)
+    3. [Examples](#examples) 
+3. [Optional environment variable](#optional-environment-variable) 
+4. [Features](#features-available)
+5. [Improvements needed](#improvements-needed)
+
+## Installation
 
 To start using allure-go, install Go and run `go get`:
 
@@ -69,8 +80,9 @@ You will now get the relative path of your test files from your project root lev
 This project is still in progress. Here is the list of available features :
 - It is possible to create a test object in the report with the `allure.Test()` method.
 - It is possible to create a step object inside a test object of the report with the `allure.Step()` method.
-- It is possible to pass parameters to a test object or a step object with the `allure.TestWithParameters()` and `allure.StepWithParameters()` methods.
+- It is possible to pass parameters to a test object or a step object.
 - It is possible to add attachments to a test object or a step object with the `allure.AddAttachment()` method (depending if it is called inside an `allure.Test()` wrapper or an `allure.Step()` wrapper).
+- Setup and Teardown phases are available and can be specified with `allure.BeforeTest()` and `allure.AfterTest()` functions accordingly.
 
 ## Improvements needed
 
@@ -86,3 +98,4 @@ Here is the list of improvements that are needed for existing features :
 - [X] Add support of Categories
 - [X] Add support of Features
 - [X] Add support for environment files
+- [ ] Add support for history
