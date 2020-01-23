@@ -43,7 +43,7 @@ $ go get -u github.com/dailymotion/allure-go
 Golang's approach to evaluating test scripts does not allow to establish a single location for test results 
 programmatically, the following environment variable is required for `allure-go` to work as expected. 
 In order to specify the location of a report run the following:
-```
+```shell script
 export ALLURE_RESULTS_PATH=</some/path>
 ```
 
@@ -54,7 +54,7 @@ export ALLURE_RESULTS_PATH=</some/path>
 Allure-go will retrieve the absolute path of your testing files (for example, /Users/myuser/Dev/myProject/tests/myfile_test.go) and will display this path in the reports.
 
 To make it cleaner, you can trim prefix the path of your project by defining the `ALLURE_WORKSPACE_PATH` with the value of your project root path :
-```
+```shell script
 export ALLURE_WORKSPACE_PATH=/another/path
 ```
 
@@ -67,7 +67,15 @@ You will now get the relative path of your test files from your project root lev
 `allure-go` takes advantage of Allure Reports feature of nested steps and allows marking portions of the code as steps 
 even if said portions are found outside test scripts in functions that are eventually called by a test script.
 This is a great feature for enabling levels of detail for test reporting.
-```
+```go
+package test
+
+import (
+        "fmt"
+        "github.com/dailymotion/allure-go"
+        "testing"
+)
+ 
 func TestStep(t *testing.T) {
     allure.Step(allure.Description("Action"),
                 allure.Action(func() {
@@ -88,26 +96,26 @@ func PerformAction() {
 
 Option slices allow providing as much or as little detail for the test scripts as needed.
 #### Description
-```
+```go
 allure.Description("Description of a test or a step")
 ```
 Provides a name for the step and a description for the test. This option is required
  
 #### Action
-```
+```go
 allure.Action(func() {})
 ```
 This option is a wrapper for the portion of code that is either your test or your step. This option is required.
 
 #### Parameter
-```
+```go
 allure.Parameter(name string, value interface{})
 ```
 This option specifies parameters for the test or step accordingly.
 This particular option can be called multiple times to add multiple parameters.
 
 #### Parameters
-```
+```go
 allure.Parameters(parameters map[string]interface{})
 ```
 This option allows specifying multiple parameters at once. 
@@ -116,38 +124,38 @@ This option can be called multiple times as well and will not interfere with pre
 ### Test-specific options
 
 #### Lead
-```
+```go
 allure.Lead(lead string)
 ```
 This option specifies a lead of the feature.
 
 #### Owner
-```
+```go
 allure.Owner(owner string)
 ```
 This option specifies an owner of the feature.
 
 #### Epic
-```
+```go
 allure.Epic(epic string)
 ```
 This option specifies an epic this test belongs to.
 
 #### Severity
-```
+```go
 allure.Severity(severity severity.Severity)
 ```
 This option specifies a severity level of the test script to allow better prioritization.
 
 #### Story
-```
+```go
 allure.Story(story string)
 ```
 This option specifies a story this test script belongs to. 
 This particular option can be called multiple times to connect this test script to multiple stories. 
 
 #### Feature
-```
+```go
 allure.Feature(feature string)
 ```
 This option specifies a feature this test script belongs to.
@@ -157,20 +165,34 @@ This particular option can be called multiple times to connect this test script 
 `allure-go` allows specifying parameters on both test and step level to further improvement informativeness of your 
 test scripts and bring it one step closer to being documentation. 
 In order to specify a parameter refer to the following example:
-```
+```go
+package test
+
+import (
+           "github.com/dailymotion/allure-go"
+           "testing"
+        )     
+
 func TestParameter(t *testing.T) {
-    allure.Test(allure.Description("Test that has parameters"),
+    allure.Test(t, 
+                allure.Description("Test that has parameters"),
                 allure.Parameter("testParameter", "test"),
                 allure.Action(func() {
                     allure.Step(allure.Description("Step with parameters"),
                                 allure.Action(func() {}),
                                 allure.Parameter("stepParameter", "step"))
-                })
-        )
+                }))
 }
 ```
 Allure parameters integrate neatly with Golang's parameterized tests too:
-```
+```go
+package test
+
+import (
+           "github.com/dailymotion/allure-go"
+           "testing"
+        )
+
 func TestParameterized(t *testing.T) {
     for i := 0; i < 5; i++ {
     		t.Run("", func(t *testing.T) {
@@ -188,14 +210,23 @@ func TestParameterized(t *testing.T) {
 The most common MIME types are available as constants in `allure-go` 
 (`image/png`, `application/json`, `text/plain` and `video/mpeg`).
 In order to attach content to a test or step refer to the following example:
-```
+```go
+package test
+
+import (
+            "errors"
+            "github.com/dailymotion/allure-go"
+            "log"
+            "testing"
+   )
+
 func TestImageAttachmentToStep(t *testing.T) {
 	allure.Test(t, 
         allure.Description("testing image attachment"), 
         allure.Action(func() {
             allure.Step(allure.Description("adding an image attachment"), 
                 allure.Action(func() {
-                    err := allure.AddAttachment("image", allure.ImagePng, <byte array representing an image>)
+                    err := allure.AddAttachment("image", allure.ImagePng, []byte("<byte array representing an image>"))
                     if err != nil {
                         log.Println(err)
                     }
@@ -215,7 +246,13 @@ This is done to allow various logical conclusions, such as upon failure of `allu
 will be skipped, etc.
 
 Please refer to the following example of setup/teardown usage:
-```
+```go
+package test
+
+import (
+        "github.com/dailymotion/allure-go"
+        "testing"
+)
 func TestAllureSetupTeardown(t *testing.T) {
 	allure.BeforeTest(t,
 		allure.Description("setup"),
@@ -250,7 +287,7 @@ inside `t.Run(...)` call.
 variables that you want to appear in the report such as browser kind and version, OS, environment name, etc.
 In order to do that create an `environment.xml` or `environment.properties` file as instructed [here](https://docs.qameta.io/allure/#_environment) and define an
 environment variable for `allure-go` to incorporate in the results:
-```
+```shell script
 export ALLURE_ENVIRONMENT_FILE_PATH=<path to environment file>
 ```
 
