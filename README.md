@@ -9,28 +9,28 @@
     1. [Specifying `allure-results` folder location](#specifying-allure-results-folder-location)
     2. [Optional environment variable](#optional-environment-variable) 
 3. [Features](#features)
-    1. [Nested Steps](#nested-steps)
-    2. [Option Slices](#option-slices)
+    1. [Test Wrapper](#test-wrapper)
+    2. [Nested Steps](#nested-steps)
+    3. [Option Slices](#option-slices)
         1. [Description](#description)
         2. [Action](#action)
         3. [Parameter](#parameter)
         4. [Parameters](#parameters)
-    3. [Test-specific options](#test-specific-options)
+    4. [Test-specific options](#test-specific-options)
         1. [Lead](#lead)
         2. [Owner](#owner)
         3. [Epic](#epic)
         4. [Severity](#severity)
         5. [Story](#story)
         6. [Feature](#feature)
-    3. [Parameters](#parameters-as-a-feature)
-    4. [Attachments](#attachments)
-    5. [Setup/Teardown](#setupteardown)
-    6. [Environment files](#environment-files)
+    4. [Parameters](#parameters-as-a-feature)
+    5. [Attachments](#attachments)
+    6. [Setup/Teardown](#setupteardown)
+    7. [Environment files](#environment-files)
 4. [Feature Roadmap](#feature-roadmap) 
 
 
 ## Installation
-
 In order to retrieve `allure-go` simply run the following command (assuming `Go` is installed):
 ```sh
 $ go get -u github.com/dailymotion/allure-go
@@ -39,7 +39,6 @@ $ go get -u github.com/dailymotion/allure-go
 ## Usage
 
 ### Specifying allure-results folder location
-
 Golang's approach to evaluating test scripts does not allow to establish a single location for test results 
 programmatically, the following environment variable is required for `allure-go` to work as expected. 
 In order to specify the location of a report run the following:
@@ -50,7 +49,6 @@ export ALLURE_RESULTS_PATH=</some/path>
 `allure-results` folder will be created in that location. 
 
 ### Optional environment variable
-
 Allure-go will retrieve the absolute path of your testing files (for example, /Users/myuser/Dev/myProject/tests/myfile_test.go) and will display this path in the reports.
 
 To make it cleaner, you can trim prefix the path of your project by defining the `ALLURE_WORKSPACE_PATH` with the value of your project root path :
@@ -62,8 +60,30 @@ You will now get the relative path of your test files from your project root lev
 
 ## Features
 
-### Nested Steps
+### Test Wrapper
+`allure-go` test reporting relies on wrapping test scripts inside a call to `allure.Test()` function:
+```go
+allure.Test(t *testing.T, testOptions ...Option)
+```
+This function allows adding required modules representing a test along with additional non-essential modules like labels.
+For basic usage refer to the following example:
+```go
+package test
 
+import (
+        "fmt"
+        "github.com/dailymotion/allure-go"
+        "testing"
+)
+ 
+func TestStep(t *testing.T) {
+    allure.Test(t, allure.Action(func() {
+                    fmt.Println("This block of code is a test")
+                }))
+}
+```  
+
+### Nested Steps
 `allure-go` takes advantage of Allure Reports feature of nested steps and allows marking portions of the code as steps 
 even if said portions are found outside test scripts in functions that are eventually called by a test script.
 This is a great feature for enabling levels of detail for test reporting.
@@ -77,11 +97,13 @@ import (
 )
  
 func TestStep(t *testing.T) {
-    allure.Step(allure.Description("Action"),
-                allure.Action(func() {
-                        fmt.Println("This block of code is a step")
+    allure.Test(t, allure.Action(func() {
+                    allure.Step(allure.Description("Action"),
+                                    allure.Action(func() {
+                                            fmt.Println("This block of code is a step")
+                                    }))
+                    PerformAction()
                 }))
-    PerformAction()
 }
 
 func PerformAction() {
@@ -93,8 +115,8 @@ func PerformAction() {
 ```
 
 ### Option Slices
-
 Option slices allow providing as much or as little detail for the test scripts as needed.
+
 #### Description
 ```go
 allure.Description("Description of a test or a step")
