@@ -64,14 +64,14 @@ func getTimestampMs() int64 {
 }
 
 func createFolderIfNotExists() {
-	resultsPathEnv := os.Getenv(ResultsPathEnvKey)
+	resultsPathEnv := os.Getenv(resultsPathEnvKey)
 	if resultsPathEnv == "" {
-		log.Printf("environment variable %s cannot be empty\n", ResultsPathEnvKey)
+		log.Printf("environment variable %s cannot be empty\n", resultsPathEnvKey)
 	}
-	ResultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
+	resultsPath = fmt.Sprintf("%s/allure-results", resultsPathEnv)
 
-	if _, err := os.Stat(ResultsPath); os.IsNotExist(err) {
-		err = os.Mkdir(ResultsPath, 0777)
+	if _, err := os.Stat(resultsPath); os.IsNotExist(err) {
+		err = os.Mkdir(resultsPath, 0777)
 		if err != nil {
 			log.Println(err, "Failed to create allure-results folder")
 		}
@@ -79,10 +79,10 @@ func createFolderIfNotExists() {
 }
 
 func copyEnvFileIfExists() {
-	if envFilePath := os.Getenv(EnvFileKey); envFilePath != "" {
+	if envFilePath := os.Getenv(envFileKey); envFilePath != "" {
 		envFilesStrings := strings.Split(envFilePath, "/")
-		if ResultsPath != "" {
-			if _, err := copy(envFilePath, ResultsPath+"/"+envFilesStrings[len(envFilesStrings)-1]); err != nil {
+		if resultsPath != "" {
+			if _, err := copy(envFilePath, resultsPath+"/"+envFilesStrings[len(envFilesStrings)-1]); err != nil {
 				log.Println("Could not copy the environment file", err)
 			}
 		}

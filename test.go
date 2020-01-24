@@ -44,6 +44,7 @@ func Test(t *testing.T, testOptions ...Option) {
 
 	defer func() {
 		panicObject := recover()
+ 		getCurrentTestPhaseObject(t).Test = r
 		r.Stop = getTimestampMs()
 		if panicObject != nil {
 			t.Fail()
@@ -61,6 +62,18 @@ func Test(t *testing.T, testOptions ...Option) {
 		err := r.writeResultsFile()
 		if err != nil {
 			log.Println("Failed to write content of result to json file", err)
+		}
+		setups := getCurrentTestPhaseObject(t).Befores
+		for _, setup := range setups {
+			setup.Children = append(setup.Children, r.UUID)
+			err := setup.writeResultsFile()
+			if err != nil {
+				log.Println("Failed to write content of result to json file", err)
+			}
+    }
+
+		if panicObject != nil {
+			panic(panicObject)
 		}
 	}()
 	ctxMgr.SetValues(gls.Values{

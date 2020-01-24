@@ -86,8 +86,16 @@ func (r *result) getStatus() string {
 	return r.Status
 }
 
+func (r *result) getStatusDetails() *statusDetails {
+	return r.StatusDetails
+}
+
+func (r *result) setStatusDetails(details statusDetails) {
+	r.StatusDetails = &details
+}
+
 func (r *result) setDefaultLabels(t *testing.T) {
-	wsd := os.Getenv(WsPathEnvKey)
+	wsd := os.Getenv(wsPathEnvKey)
 
 	programCounters := make([]uintptr, 10)
 	callersCount := runtime.Callers(0, programCounters)
@@ -126,14 +134,14 @@ func (r *result) addLabel(name string, value string) {
 }
 
 func (r *result) writeResultsFile() error {
-	CreateFolderOnce.Do(createFolderIfNotExists)
-	CopyEnvFileOnce.Do(copyEnvFileIfExists)
+	createFolderOnce.Do(createFolderIfNotExists)
+	copyEnvFileOnce.Do(copyEnvFileIfExists)
 
 	j, err := json.Marshal(r)
 	if err != nil {
 		return errors.Wrap(err, "Failed to marshall result into JSON")
 	}
-	err = ioutil.WriteFile(fmt.Sprintf("%s/%s-result.json", ResultsPath, r.UUID), j, 0777)
+	err = ioutil.WriteFile(fmt.Sprintf("%s/%s-result.json", resultsPath, r.UUID), j, 0777)
 	if err != nil {
 		return errors.Wrap(err, "Failed to write in file")
 	}
