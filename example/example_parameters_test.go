@@ -93,3 +93,12 @@ func TestAllureWithLabels(t *testing.T) {
 		allure.Feature("feature2"),
 		allure.Action(func() {}))
 }
+
+func TestAllureNamedTest(t *testing.T) {
+	allure.Test(t,
+		allure.Description("Description of a test"),
+		allure.Name("Test naming of a test"),
+		allure.Action(func() {
+			allure.Step()
+		}))
+}

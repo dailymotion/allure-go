@@ -42,9 +42,13 @@ func Test(t *testing.T, testOptions ...Option) {
 		option(r)
 	}
 
+	if r.Test == nil {
+		r.Test = func() {}
+	}
+
 	defer func() {
 		panicObject := recover()
- 		getCurrentTestPhaseObject(t).Test = r
+		getCurrentTestPhaseObject(t).Test = r
 		r.Stop = getTimestampMs()
 		if panicObject != nil {
 			t.Fail()
@@ -70,7 +74,7 @@ func Test(t *testing.T, testOptions ...Option) {
 			if err != nil {
 				log.Println("Failed to write content of result to json file", err)
 			}
-    }
+		}
 
 		if panicObject != nil {
 			panic(panicObject)

@@ -105,6 +105,9 @@ func Step(stepOptions ...Option) {
 	for _, option := range stepOptions {
 		option(stepObject)
 	}
+	if stepObject.Action == nil {
+		stepObject.Action = func() {}
+	}
 
 	defer func() {
 		panicObject := recover()
