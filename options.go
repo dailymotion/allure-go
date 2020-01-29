@@ -71,3 +71,9 @@ func Reason(reason string) Option {
 		r.addReason(reason)
 	}
 }
+
+func Name(name string) Option {
+	return func(r hasOptions) {
+		r.addName(name)
+	}
+}
