@@ -25,8 +25,9 @@
         6. [Feature](#feature)
     4. [Parameters](#parameters-as-a-feature)
     5. [Attachments](#attachments)
-    6. [Setup/Teardown](#setupteardown)
-    7. [Environment files](#environment-files)
+    6. [Error handling](#error-handling)
+    7. [Setup/Teardown](#setupteardown)
+    8. [Environment files](#environment-files)
 4. [Feature Roadmap](#feature-roadmap) 
 
 
@@ -256,6 +257,9 @@ func TestImageAttachmentToStep(t *testing.T) {
 	}))
 }
 ```
+
+### Error handling
+
 
 ### Setup/Teardown
 Golang does not directly follow the setup/teardown approach of other languages like Java, C# and Python.
