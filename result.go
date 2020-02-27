@@ -78,6 +78,10 @@ func (r *result) addStep(step stepObject) {
 	r.Steps = append(r.Steps, step)
 }
 
+func (r *result) addFullName(FullName string) {
+	r.FullName = FullName
+}
+
 func (r *result) setStatus(status string) {
 	r.Status = status
 }
@@ -111,6 +115,11 @@ func (r *result) setDefaultLabels(t *testing.T) {
 	r.addLabel("package", testPackage)
 	r.addLabel("testClass", testPackage)
 	r.addLabel("testMethod", t.Name())
+	if len(wsd) == 0 {
+		r.addFullName(fmt.Sprintf("%s:%s", testFile, t.Name()))
+	} else {
+		r.addFullName(fmt.Sprintf("%s:%s", strings.TrimPrefix(testFile, wsd+"/"), t.Name()))
+	}
 	if hostname, err := os.Hostname(); err == nil {
 		r.addLabel("host", hostname)
 	}
