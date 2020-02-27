@@ -123,7 +123,7 @@ func getCurrentTestPhaseObject(t *testing.T) *testPhaseContainer {
 }
 
 func (c container) writeResultsFile() error {
-	createFolderOnce.Do(createFolderIfNotExists)
+	ensureFolderCreated()
 	copyEnvFileOnce.Do(copyEnvFileIfExists)
 
 	j, err := json.Marshal(c)

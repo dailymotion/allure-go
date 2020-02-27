@@ -33,6 +33,7 @@ func AddAttachment(name string, mimeType MimeType, content []byte) error {
 
 func (a *attachment) writeAttachmentFile() error {
 	resultsPathEnv := os.Getenv(resultsPathEnvKey)
+	ensureFolderCreated()
 	if resultsPathEnv == "" {
 		log.Printf("%s environment variable cannot be empty\n", resultsPathEnvKey)
 	}
