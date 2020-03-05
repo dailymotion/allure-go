@@ -1,8 +1,12 @@
 package allure
 
 import (
+	"fmt"
+	"github.com/fatih/camelcase"
 	"github.com/jtolds/gls"
 	"log"
+	"runtime/debug"
+	"strings"
 	"testing"
 )
 
@@ -24,10 +28,43 @@ func BeforeTest(t *testing.T, testOptions ...Option) {
 	}
 
 	defer func() {
+		panicObject := recover()
+		if panicObject != nil {
+			t.Fail()
+			beforeSubContainer.StatusDetails = &statusDetails{
+				Message: fmt.Sprintf("%+v", panicObject),
+				Trace:   filterStackTrace(debug.Stack()),
+			}
+			beforeSubContainer.Status = broken
+		}
+
 		beforeSubContainer.Stop = getTimestampMs()
 		beforeSubContainer.Status = getTestStatus(t)
 		beforeSubContainer.Stage = "finished"
 
+		if panicObject != nil {
+			r := newResult()
+			r.Stop = getTimestampMs()
+			r.Name = strings.Join(camelcase.Split(t.Name())[1:], " ")
+			r.Description = t.Name()
+			r.setDefaultLabels(t)
+			r.Status = skipped
+
+			err := r.writeResultsFile()
+			if err != nil {
+				log.Println("Failed to write content of result to json file", err)
+			}
+
+			setups := getCurrentTestPhaseObject(t).Befores
+			for _, setup := range setups {
+				setup.Children = append(setup.Children, r.UUID)
+				err := setup.writeResultsFile()
+				if err != nil {
+					log.Println("Failed to write content of result to json file", err)
+				}
+			}
+			panic(panicObject)
+		}
 	}()
 	ctxMgr.SetValues(gls.Values{
 		testResultKey:   beforeSubContainer,
