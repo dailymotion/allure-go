@@ -29,6 +29,11 @@ func BeforeTest(t *testing.T, testOptions ...Option) {
 
 	defer func() {
 		panicObject := recover()
+
+		beforeSubContainer.Stop = getTimestampMs()
+		beforeSubContainer.Status = getTestStatus(t)
+		beforeSubContainer.Stage = "finished"
+
 		if panicObject != nil {
 			t.Fail()
 			beforeSubContainer.StatusDetails = &statusDetails{
@@ -36,13 +41,7 @@ func BeforeTest(t *testing.T, testOptions ...Option) {
 				Trace:   filterStackTrace(debug.Stack()),
 			}
 			beforeSubContainer.Status = broken
-		}
 
-		beforeSubContainer.Stop = getTimestampMs()
-		beforeSubContainer.Status = getTestStatus(t)
-		beforeSubContainer.Stage = "finished"
-
-		if panicObject != nil {
 			r := newResult()
 			r.Stop = getTimestampMs()
 			r.Name = strings.Join(camelcase.Split(t.Name())[1:], " ")

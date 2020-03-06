@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestBeforeFail(t *testing.T) {
+func TestBeforePanic(t *testing.T) {
 	allure.BeforeTest(t, allure.Action(func() {
 		panic("panic at the before statement! (disco)")
 	}))
