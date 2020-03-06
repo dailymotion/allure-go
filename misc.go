@@ -123,3 +123,7 @@ func copy(src, dst string) (int64, error) {
 	nBytes, err := io.Copy(destination, source)
 	return nBytes, err
 }
+
+func ensureFolderCreated() {
+	createFolderOnce.Do(createFolderIfNotExists)
+}
