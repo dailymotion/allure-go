@@ -27,6 +27,44 @@ type testLabels struct {
 	Language    string
 }
 
+func SkipTest(t *testing.T, testOptions ...Option) {
+	var r *result
+	r = newResult()
+	r.UUID = generateUUID()
+	r.Start = getTimestampMs()
+	r.Name = strings.Join(camelcase.Split(t.Name())[1:], " ")
+	r.Description = t.Name()
+	r.setDefaultLabels(t)
+	r.Steps = make([]stepObject, 0)
+	for _, option := range testOptions {
+		option(r)
+	}
+
+	getCurrentTestPhaseObject(t).Test = r
+	r.Stop = getTimestampMs()
+	r.Stage = "finished"
+	r.Status = skipped
+	err := r.writeResultsFile()
+	if err != nil {
+		log.Println("Failed to write content of result to json file", err)
+	}
+	setups := getCurrentTestPhaseObject(t).Befores
+	for _, setup := range setups {
+		setup.Children = append(setup.Children, r.UUID)
+		err := setup.writeResultsFile()
+		if err != nil {
+			log.Println("Failed to write content of result to json file", err)
+		}
+	}
+	defer func() {
+		if r.StatusDetails != nil {
+			t.Skip(r.StatusDetails.Message)
+		} else {
+			t.Skip()
+		}
+	}()
+}
+
 //Test execute the test and creates an Allure result used by Allure reports
 func Test(t *testing.T, testOptions ...Option) {
 	var r *result
