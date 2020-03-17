@@ -56,6 +56,13 @@ func SkipTest(t *testing.T, testOptions ...Option) {
 			log.Println("Failed to write content of result to json file", err)
 		}
 	}
+	defer func() {
+		if r.StatusDetails != nil {
+			t.Skip(r.StatusDetails.Message)
+		} else {
+			t.Skip()
+		}
+	}()
 }
 
 //Test execute the test and creates an Allure result used by Allure reports
