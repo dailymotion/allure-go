@@ -15,6 +15,7 @@ func TestSkipStep(t *testing.T) {
 
 func TestSkipTest(t *testing.T) {
 	allure.SkipTest(t,
+		allure.Reason("Skipping the test"),
 		allure.Description("Skip test"),
 		allure.Action(func() {
 			allure.SkipStep(allure.Description("Skip"), allure.Action(func() {}), allure.Reason("reason"))

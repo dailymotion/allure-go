@@ -33,7 +33,7 @@ type result struct {
 func (r *result) addReason(reason string) {
 	testStatusDetails := r.StatusDetails
 	if testStatusDetails == nil {
-		testStatusDetails = &statusDetails{}
+		r.StatusDetails = &statusDetails{}
 	}
 	r.StatusDetails.Message = reason
 }
