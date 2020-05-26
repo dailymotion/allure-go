@@ -35,7 +35,7 @@ type subContainer struct {
 	Description   string         `json:"description,omitempty"`
 	Start         int64          `json:"start,omitempty"`
 	Stop          int64          `json:"stop,omitempty"`
-	Steps         []stepObject   `json:"steps,omitempty"`
+	Steps         []StepObject   `json:"steps,omitempty"`
 	Attachments   []attachment   `json:"attachments,omitempty"`
 	Parameters    []parameter    `json:"parameters,omitempty"`
 	Action        func()         `json:"-"`
@@ -83,11 +83,11 @@ func (sc *subContainer) addAttachment(attachment attachment) {
 	sc.Attachments = append(sc.Attachments, attachment)
 }
 
-func (sc *subContainer) getSteps() []stepObject {
+func (sc *subContainer) getSteps() []StepObject {
 	return sc.Steps
 }
 
-func (sc *subContainer) addStep(step stepObject) {
+func (sc *subContainer) addStep(step StepObject) {
 	sc.Steps = append(sc.Steps, step)
 }
 
@@ -139,7 +139,7 @@ func (c container) writeResultsFile() error {
 
 func newHelper() *subContainer {
 	return &subContainer{
-		Steps:       make([]stepObject, 0),
+		Steps:       make([]StepObject, 0),
 		Attachments: make([]attachment, 0),
 		Parameters:  make([]parameter, 0),
 	}

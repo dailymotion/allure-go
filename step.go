@@ -8,12 +8,12 @@ import (
 	"github.com/jtolds/gls"
 )
 
-type stepObject struct {
+type StepObject struct {
 	Name          string         `json:"name,omitempty"`
 	Status        string         `json:"status,omitempty"`
 	StatusDetails *statusDetails `json:"statusDetails,omitempty"`
 	Stage         string         `json:"stage"`
-	ChildrenSteps []stepObject   `json:"steps"`
+	ChildrenSteps []StepObject   `json:"steps"`
 	Attachments   []attachment   `json:"attachments"`
 	Parameters    []parameter    `json:"parameters"`
 	Start         int64          `json:"start"`
@@ -21,7 +21,7 @@ type stepObject struct {
 	Action        func()         `json:"-"`
 }
 
-func (s *stepObject) addReason(reason string) {
+func (s *StepObject) addReason(reason string) {
 	testStatusDetails := s.StatusDetails
 	if testStatusDetails == nil {
 		s.StatusDetails = &statusDetails{}
@@ -29,53 +29,53 @@ func (s *stepObject) addReason(reason string) {
 	s.StatusDetails.Message = reason
 }
 
-func (s *stepObject) addLabel(key string, value string) {
+func (s *StepObject) addLabel(key string, value string) {
 	// Step doesn't have labels
 }
 
-func (s *stepObject) addDescription(description string) {
+func (s *StepObject) addDescription(description string) {
 	s.Name = description
 }
 
-func (s *stepObject) addParameter(name string, value interface{}) {
+func (s *StepObject) addParameter(name string, value interface{}) {
 	s.Parameters = append(s.Parameters, parseParameter(name, value))
 }
 
-func (s *stepObject) addParameters(parameters map[string]interface{}) {
+func (s *StepObject) addParameters(parameters map[string]interface{}) {
 	for key, value := range parameters {
 		s.Parameters = append(s.Parameters, parseParameter(key, value))
 	}
 }
 
-func (s *stepObject) addName(name string) {
+func (s *StepObject) addName(name string) {
 	s.Name = name
 }
 
-func (s *stepObject) addAction(action func()) {
+func (s *StepObject) addAction(action func()) {
 	s.Action = action
 }
 
-func (s *stepObject) getSteps() []stepObject {
+func (s *StepObject) getSteps() []StepObject {
 	return s.ChildrenSteps
 }
 
-func (s *stepObject) addStep(step stepObject) {
+func (s *StepObject) addStep(step StepObject) {
 	s.ChildrenSteps = append(s.ChildrenSteps, step)
 }
 
-func (s *stepObject) getAttachments() []attachment {
+func (s *StepObject) getAttachments() []attachment {
 	return s.Attachments
 }
 
-func (s *stepObject) addAttachment(attachment attachment) {
+func (s *StepObject) addAttachment(attachment attachment) {
 	s.Attachments = append(s.Attachments, attachment)
 }
 
-func (s *stepObject) setStatus(status string) {
+func (s *StepObject) setStatus(status string) {
 	s.Status = status
 }
 
-func (s *stepObject) getStatus() string {
+func (s *StepObject) getStatus() string {
 	return s.Status
 }
 
@@ -142,10 +142,63 @@ func Step(stepOptions ...Option) {
 	ctxMgr.SetValues(gls.Values{nodeKey: stepObject}, stepObject.Action)
 }
 
-func newStep() *stepObject {
-	return &stepObject{
+// Step is meant to be wrapped around actions
+func CopyStep(stepOptions ...Option) *StepObject {
+	stepObject := newStep()
+	stepObject.Start = getTimestampMs()
+	for _, option := range stepOptions {
+		option(stepObject)
+	}
+	if stepObject.Action == nil {
+		stepObject.Action = func() {}
+	}
+
+	defer func() {
+		panicObject := recover()
+		stepObject.Stop = getTimestampMs()
+		manipulateOnObjectFromCtx(
+			testInstanceKey,
+			func(testInstance interface{}) {
+				if panicObject != nil {
+					Break(errors.Errorf("%+v", panicObject))
+				}
+				if testInstance.(*testing.T).Failed() ||
+					panicObject != nil {
+					if stepObject.Status == "" {
+						stepObject.Status = "failed"
+					}
+				}
+			})
+		stepObject.Stage = "finished"
+		if stepObject.Status == "" {
+			stepObject.Status = "passed"
+		}
+		manipulateOnObjectFromCtx(nodeKey, func(currentStepObj interface{}) {
+			currentStep := currentStepObj.(hasSteps)
+			currentStep.addStep(*stepObject)
+		})
+
+		if panicObject != nil {
+			panic(panicObject)
+		}
+	}()
+
+	ctxMgr.SetValues(gls.Values{nodeKey: stepObject}, stepObject.Action)
+
+	return stepObject
+}
+
+func PasteStep(object *StepObject) {
+	manipulateOnObjectFromCtx(nodeKey, func(currentStepObj interface{}) {
+		currentStep := currentStepObj.(hasSteps)
+		currentStep.addStep(*object)
+	})
+}
+
+func newStep() *StepObject {
+	return &StepObject{
 		Attachments:   make([]attachment, 0),
-		ChildrenSteps: make([]stepObject, 0),
+		ChildrenSteps: make([]StepObject, 0),
 		Parameters:    make([]parameter, 0),
 	}
 }
