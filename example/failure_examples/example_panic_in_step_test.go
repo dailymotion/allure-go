@@ -1,4 +1,4 @@
-package example
+package failure_examples
 
 import (
 	"github.com/dailymotion/allure-go"

@@ -88,12 +88,15 @@ func Test(t *testing.T, testOptions ...Option) {
 		getCurrentTestPhaseObject(t).Test = r
 		r.Stop = getTimestampMs()
 		if panicObject != nil {
+			isFailed := t.Failed()
 			t.Fail()
 			r.StatusDetails = &statusDetails{
 				Message: fmt.Sprintf("%+v", panicObject),
 				Trace:   filterStackTrace(debug.Stack()),
 			}
-			r.Status = broken
+			if !isFailed {
+				r.Status = broken
+			}
 		}
 		if r.Status == "" {
 			r.Status = getTestStatus(t)
@@ -113,9 +116,9 @@ func Test(t *testing.T, testOptions ...Option) {
 			}
 		}
 
-		if panicObject != nil {
-			panic(panicObject)
-		}
+		//if panicObject != nil {
+		//	panic(panicObject)
+		//}
 	}()
 	ctxMgr.SetValues(gls.Values{
 		testResultKey:   r,

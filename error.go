@@ -51,10 +51,9 @@ func allureError(err error, status string, now bool) {
 	manipulateOnObjectFromCtx(
 		testInstanceKey,
 		func(testInstance interface{}) {
+			testInstance.(*testing.T).Fail()
 			if now {
-				testInstance.(*testing.T).FailNow()
-			} else {
-				testInstance.(*testing.T).Fail()
+				panic(err)
 			}
 		})
 }
