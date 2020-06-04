@@ -19,7 +19,7 @@ type result struct {
 	Status        string         `json:"status,omitempty"`
 	StatusDetails *statusDetails `json:"statusDetails,omitempty"`
 	Stage         string         `json:"stage,omitempty"`
-	Steps         []stepObject   `json:"steps,omitempty"`
+	Steps         []StepObject   `json:"steps,omitempty"`
 	Attachments   []attachment   `json:"attachments,omitempty"`
 	Parameters    []parameter    `json:"parameters,omitempty"`
 	Start         int64          `json:"start,omitempty"`
@@ -70,11 +70,11 @@ func (r *result) addAttachment(attachment attachment) {
 	r.Attachments = append(r.Attachments, attachment)
 }
 
-func (r *result) getSteps() []stepObject {
+func (r *result) getSteps() []StepObject {
 	return r.Steps
 }
 
-func (r *result) addStep(step stepObject) {
+func (r *result) addStep(step StepObject) {
 	r.Steps = append(r.Steps, step)
 }
 

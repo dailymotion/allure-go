@@ -22,7 +22,7 @@ func BeforeTest(t *testing.T, testOptions ...Option) {
 
 	before.UUID = generateUUID()
 	beforeSubContainer.Start = getTimestampMs()
-	beforeSubContainer.Steps = make([]stepObject, 0)
+	beforeSubContainer.Steps = make([]StepObject, 0)
 	for _, option := range testOptions {
 		option(beforeSubContainer)
 	}

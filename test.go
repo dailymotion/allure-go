@@ -35,7 +35,7 @@ func SkipTest(t *testing.T, testOptions ...Option) {
 	r.Name = strings.Join(camelcase.Split(t.Name())[1:], " ")
 	r.Description = t.Name()
 	r.setDefaultLabels(t)
-	r.Steps = make([]stepObject, 0)
+	r.Steps = make([]StepObject, 0)
 	for _, option := range testOptions {
 		option(r)
 	}
@@ -74,7 +74,7 @@ func Test(t *testing.T, testOptions ...Option) {
 	r.Name = strings.Join(camelcase.Split(t.Name())[1:], " ")
 	r.Description = t.Name()
 	r.setDefaultLabels(t)
-	r.Steps = make([]stepObject, 0)
+	r.Steps = make([]StepObject, 0)
 	for _, option := range testOptions {
 		option(r)
 	}

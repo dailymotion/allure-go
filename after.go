@@ -13,7 +13,7 @@ func AfterTest(t *testing.T, testOptions ...Option) {
 	after.UUID = generateUUID()
 	afterSubContainer.Start = getTimestampMs()
 
-	afterSubContainer.Steps = make([]stepObject, 0)
+	afterSubContainer.Steps = make([]StepObject, 0)
 	for _, option := range testOptions {
 		option(afterSubContainer)
 	}
