@@ -1,9 +1,10 @@
 package allure
 
 import (
-	"github.com/pkg/errors"
 	"log"
 	"testing"
+
+	"github.com/pkg/errors"
 
 	"github.com/jtolds/gls"
 )

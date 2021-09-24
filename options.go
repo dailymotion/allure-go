@@ -77,3 +77,21 @@ func Name(name string) Option {
 		r.addName(name)
 	}
 }
+
+func Suite(suite string) Option {
+	return func(r hasOptions) {
+		r.addLabel("suite", suite)
+	}
+}
+
+func SubSuite(subSuite string) Option {
+	return func(r hasOptions) {
+		r.addLabel("subSuite", subSuite)
+	}
+}
+
+func ParentSuite(parentSuite string) Option {
+	return func(r hasOptions) {
+		r.addLabel("parentSuite", parentSuite)
+	}
+}
