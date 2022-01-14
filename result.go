@@ -3,17 +3,20 @@ package allure
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/pkg/errors"
 )
 
 //result is the top level report object for a test
 type result struct {
 	UUID          string         `json:"uuid,omitempty"`
+	TestCaseID    string         `json:"testCaseId,omitempty"`
+	HistoryID     string         `json:"historyId,omitempty"`
 	Name          string         `json:"name,omitempty"`
 	Description   string         `json:"description,omitempty"`
 	Status        string         `json:"status,omitempty"`
@@ -128,9 +131,6 @@ func (r *result) setDefaultLabels(t *testing.T) {
 
 	//TODO: these labels are available, but should be handled separately.
 
-	//	ParentSuite string
-	//	Suite       string
-	//	SubSuite    string
 	//	Thread      string
 	//	Framework   string
 }

@@ -1,14 +1,16 @@
 package allure
 
 import (
+	"crypto/sha256"
 	"fmt"
-	"github.com/dailymotion/allure-go/severity"
-	"github.com/fatih/camelcase"
-	"github.com/jtolds/gls"
 	"log"
 	"runtime/debug"
 	"strings"
 	"testing"
+
+	"github.com/dailymotion/allure-go/severity"
+	"github.com/fatih/camelcase"
+	"github.com/jtolds/gls"
 )
 
 type testLabels struct {
@@ -39,6 +41,10 @@ func SkipTest(t *testing.T, testOptions ...Option) {
 	for _, option := range testOptions {
 		option(r)
 	}
+
+	currentHash := getSha256(r.Labels, r.FullName)
+	r.TestCaseID = currentHash
+	r.HistoryID = currentHash
 
 	getCurrentTestPhaseObject(t).Test = r
 	r.Stop = getTimestampMs()
@@ -83,6 +89,10 @@ func Test(t *testing.T, testOptions ...Option) {
 		r.Test = func() {}
 	}
 
+	currentHash := getSha256(r.Labels, r.FullName)
+	r.TestCaseID = currentHash
+	r.HistoryID = currentHash
+
 	defer func() {
 		panicObject := recover()
 		getCurrentTestPhaseObject(t).Test = r
@@ -125,4 +135,15 @@ func Test(t *testing.T, testOptions ...Option) {
 		nodeKey:         r,
 		testInstanceKey: t,
 	}, r.Test)
+}
+
+func getSha256(labels []label, name string) string {
+	hash := sha256.New()
+
+	hash.Write([]byte(fmt.Sprintf("%v", struct {
+		Labels []label
+		Name   string
+	}{labels, name})))
+
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }
