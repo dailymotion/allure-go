@@ -93,6 +93,7 @@ func TestAllureWithLabels(t *testing.T) {
 		allure.Feature("feature1"),
 		allure.Feature("feature2"),
 		allure.Tag("tag1"),
+		allure.Tags("tag2", "tag3"),
 		allure.Action(func() {}))
 }
 

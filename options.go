@@ -8,7 +8,7 @@ type Option func(r hasOptions)
 
 func ID(id string) Option {
 	return func(r hasOptions) {
-		r.addLabel("as_id", id)
+		r.addLabel("AS_ID", id)
 	}
 }
 
@@ -51,6 +51,14 @@ func Feature(feature string) Option {
 func Tag(tag string) Option {
 	return func(r hasOptions) {
 		r.addLabel("tag", tag)
+	}
+}
+
+func Tags(tags ...string) Option {
+	return func(r hasOptions) {
+		for _, tag := range tags {
+			r.addLabel("tag", tag)
+		}
 	}
 }
 
