@@ -143,7 +143,24 @@ func getSha256(labels []label, name string) string {
 	hash.Write([]byte(fmt.Sprintf("%v", struct {
 		Labels []label
 		Name   string
-	}{labels, name})))
+	}{sanitizeLabels(labels), name})))
 
 	return fmt.Sprintf("%x", hash.Sum(nil))
+}
+
+// This function filters out 'host' and 'thread' labels that are dynamic and cause issues for
+// testCaseId and historyId attributes which should be identical across hosts with dynamic host naming,
+//e.g. in a container in Kubernetes cluster.
+func sanitizeLabels(labels []label) []label {
+	sanitizedLabels := make([]label, 0)
+
+	for _, label := range labels {
+		if label.Name == "host" || label.Name == "thread" {
+			continue
+		} else {
+			sanitizedLabels = append(sanitizedLabels, label)
+		}
+	}
+
+	return sanitizedLabels
 }
