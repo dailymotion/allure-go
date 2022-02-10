@@ -84,6 +84,7 @@ func TestAllureParameterTypes(t *testing.T) {
 func TestAllureWithLabels(t *testing.T) {
 	allure.Test(t, allure.Description("Test with labels"),
 		allure.Epic("Epic Epic of Epicness"),
+		allure.ID("id1"),
 		allure.Lead("Duke Nukem"),
 		allure.Owner("Rex Powercolt"),
 		allure.Severity(severity.Critical),
@@ -91,6 +92,8 @@ func TestAllureWithLabels(t *testing.T) {
 		allure.Story("story2"),
 		allure.Feature("feature1"),
 		allure.Feature("feature2"),
+		allure.Tag("tag1"),
+		allure.Tags("tag2", "tag3"),
 		allure.Action(func() {}))
 }
 

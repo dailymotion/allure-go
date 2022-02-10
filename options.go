@@ -6,6 +6,12 @@ import (
 
 type Option func(r hasOptions)
 
+func ID(id string) Option {
+	return func(r hasOptions) {
+		r.addLabel("AS_ID", id)
+	}
+}
+
 func Lead(lead string) Option {
 	return func(r hasOptions) {
 		r.addLabel("lead", lead)
@@ -39,6 +45,20 @@ func Story(story string) Option {
 func Feature(feature string) Option {
 	return func(r hasOptions) {
 		r.addLabel("feature", feature)
+	}
+}
+
+func Tag(tag string) Option {
+	return func(r hasOptions) {
+		r.addLabel("tag", tag)
+	}
+}
+
+func Tags(tags ...string) Option {
+	return func(r hasOptions) {
+		for _, tag := range tags {
+			r.addLabel("tag", tag)
+		}
 	}
 }
 
