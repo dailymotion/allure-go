@@ -94,7 +94,7 @@ func TestAllureWithLabels(t *testing.T) {
 		allure.Feature("feature2"),
 		allure.Tag("tag1"),
 		allure.Tags("tag2", "tag3"),
-		allure.Label("customLabel1", "customLabel2"),
+		allure.Label("customLabel1", "customLabel1Value"),
 		allure.Action(func() {}))
 }
 
