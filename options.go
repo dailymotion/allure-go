@@ -115,3 +115,9 @@ func ParentSuite(parentSuite string) Option {
 		r.addLabel("parentSuite", parentSuite)
 	}
 }
+
+func Label(labelName string, labelValue string) Option {
+	return func(r hasOptions) {
+		r.addLabel(labelName, labelValue)
+	}
+}
