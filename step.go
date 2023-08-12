@@ -30,6 +30,10 @@ func (s *stepObject) addReason(reason string) {
 	s.StatusDetails.Message = reason
 }
 
+func (s *stepObject) addLink(url, name string, linkType LinkType) {
+	// Step doesn't have links
+}
+
 func (s *stepObject) addLabel(key string, value string) {
 	// Step doesn't have labels
 }

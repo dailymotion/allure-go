@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-//result is the top level report object for a test
+// result is the top level report object for a test
 type result struct {
 	UUID          string         `json:"uuid,omitempty"`
 	TestCaseID    string         `json:"testCaseId,omitempty"`
@@ -30,6 +30,7 @@ type result struct {
 	Children      []string       `json:"children,omitempty"`
 	FullName      string         `json:"fullName,omitempty"`
 	Labels        []label        `json:"labels,omitempty"`
+	Links         []link         `json:"links,omitempty"`
 	Test          func()         `json:"-"`
 }
 
@@ -133,6 +134,14 @@ func (r *result) setDefaultLabels(t *testing.T) {
 
 	//	Thread      string
 	//	Framework   string
+}
+
+func (r *result) addLink(url, name string, linkType LinkType) {
+	r.Links = append(r.Links, link{
+		Url:  url,
+		Name: name,
+		Type: linkType,
+	})
 }
 
 func (r *result) addLabel(name string, value string) {

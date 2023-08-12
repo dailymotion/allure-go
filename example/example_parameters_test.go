@@ -92,6 +92,7 @@ func TestAllureWithLabels(t *testing.T) {
 		allure.Story("story2"),
 		allure.Feature("feature1"),
 		allure.Feature("feature2"),
+		allure.Layer("integration-tests"),
 		allure.Tag("tag1"),
 		allure.Tags("tag2", "tag3"),
 		allure.Label("customLabel1", "customLabel1Value"),
