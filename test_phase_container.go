@@ -26,7 +26,7 @@ type container struct {
 	Stop        int64           `json:"stop"`
 }
 
-//subContainer defines a step
+// subContainer defines a step
 type subContainer struct {
 	Name          string         `json:"name,omitempty"`
 	Status        string         `json:"status,omitempty"`
@@ -39,6 +39,10 @@ type subContainer struct {
 	Attachments   []attachment   `json:"attachments,omitempty"`
 	Parameters    []parameter    `json:"parameters,omitempty"`
 	Action        func()         `json:"-"`
+}
+
+func (s *subContainer) addLink(url, name string, linkType LinkType) {
+	panic("implement me")
 }
 
 func (sc *subContainer) addLabel(key string, value string) {

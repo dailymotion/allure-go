@@ -98,6 +98,30 @@ func Name(name string) Option {
 	}
 }
 
+func Layer(layer string) Option {
+	return func(r hasOptions) {
+		r.addLabel("layer", layer)
+	}
+}
+
+func Link(url, name string) Option {
+	return func(r hasOptions) {
+		r.addLink(url, name, AnyLinkType)
+	}
+}
+
+func Issue(url, name string) Option {
+	return func(r hasOptions) {
+		r.addLink(url, name, IssueType)
+	}
+}
+
+func TestCase(url, name string) Option {
+	return func(r hasOptions) {
+		r.addLink(url, name, TestCaseType)
+	}
+}
+
 func Suite(suite string) Option {
 	return func(r hasOptions) {
 		r.addLabel("suite", suite)

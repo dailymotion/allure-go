@@ -1,6 +1,7 @@
 package allure
 
 type hasOptions interface {
+	addLink(url, name string, linkType LinkType)
 	addLabel(key string, value string)
 	addDescription(description string)
 	addParameter(name string, value interface{})
