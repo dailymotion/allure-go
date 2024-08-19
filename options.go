@@ -145,3 +145,11 @@ func Label(labelName string, labelValue string) Option {
 		r.addLabel(labelName, labelValue)
 	}
 }
+
+func Labels(labelName string, labelValues ...string) Option {
+	return func(r hasOptions) {
+		for _, labelValue := range labelValues {
+			r.addLabel(labelName, labelValue)
+		}
+	}
+}
