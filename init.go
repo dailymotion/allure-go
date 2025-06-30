@@ -1,8 +1,9 @@
 package allure
 
 import (
-	"github.com/jtolds/gls"
 	"sync"
+
+	"github.com/jtolds/gls"
 )
 
 var (
@@ -11,7 +12,7 @@ var (
 	resultsPath      string
 	createFolderOnce sync.Once
 	copyEnvFileOnce  sync.Once
-	testPhaseObjects map[string]*testPhaseContainer
+	testPhaseObjects sync.Map
 )
 
 const (
@@ -25,5 +26,5 @@ const (
 
 func init() {
 	ctxMgr = gls.NewContextManager()
-	testPhaseObjects = make(map[string]*testPhaseContainer)
+	testPhaseObjects = sync.Map{}
 }

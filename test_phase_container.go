@@ -112,18 +112,11 @@ func (sc *subContainer) getStatus() string {
 }
 
 func getCurrentTestPhaseObject(t *testing.T) *testPhaseContainer {
-	var currentPhaseObject *testPhaseContainer
-	if phaseContainer, ok := testPhaseObjects[t.Name()]; ok {
-		currentPhaseObject = phaseContainer
-	} else {
-		currentPhaseObject = &testPhaseContainer{
-			Befores: make([]*container, 0),
-			Afters:  make([]*container, 0),
-		}
-		testPhaseObjects[t.Name()] = currentPhaseObject
-	}
-
-	return currentPhaseObject
+	phaseContainer, _ := testPhaseObjects.LoadOrStore(t.Name(), &testPhaseContainer{
+		Befores: make([]*container, 0),
+		Afters:  make([]*container, 0),
+	})
+	return phaseContainer.(*testPhaseContainer)
 }
 
 func (c container) writeResultsFile() error {
